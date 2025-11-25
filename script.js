@@ -47,7 +47,7 @@ const pokemon_names_for_label = pokemonData.map(p => p.name);
 const trace = {
   x: x_data,
   y: y_data,
-  mode: 'markers+text', // マーカーとテキストを表示
+  mode: 'markers+text',
   type: 'scatter',
   name: 'ポケモン散布図',
   text: pokemon_names_for_label,
@@ -62,24 +62,21 @@ const trace = {
     opacity: 0.8,
     color: 'rgb(50, 100, 200)'
   },
-  hoverinfo: 'none', // デフォルトのツールチップを無効化
+  hoverinfo: 'none',
 };
 
 const layout = {
-  // ★修正点1★: タイトルの変更を再適用
   title: '散布図_食材ポケモン',
   xaxis: {
     title: {
         text: 'おてつだい時間 (秒)',
-        // ★修正点2★: x軸タイトルのフォントサイズを大きく
         font: {
             size: 18 
         }
     },
-    // ★修正点3★: 正常動作していた hovermode: 'closest' に戻す
-    // ★修正点4★: 第一象限表示のため、rangemode: 'tozero' を再適用
+    // ★修正点★: おてつだい時間（X軸）の表示範囲を 2000秒 からデータの最大値+α に設定
+    range: [2000, Math.max(...x_data) * 1.05], 
     rangemode: 'tozero', 
-    // ★修正点5★: x軸目盛りのフォントサイズを大きく
     tickfont: {
         size: 14 
     },
@@ -87,21 +84,18 @@ const layout = {
   yaxis: {
     title: {
         text: '食材確率 (%)',
-        // ★修正点6★: y軸タイトルのフォントサイズを大きく
         font: {
             size: 18
         }
     },
-    // ★修正点7★: 第一象限表示のため、rangemode: 'tozero' を再適用
+    // ★修正点★: 食材確率（Y軸）の表示範囲を 10% からデータの最大値+α に設定
+    range: [10, Math.max(...y_data) * 1.05],
     rangemode: 'tozero',
-    // ★修正点8★: y軸目盛りのフォントサイズを大きく
     tickfont: {
         size: 14
     },
     tickformat: '.1f',
   },
-  // ★重要★: ホバーが正常動作していた状態に戻すため 'closest' を適用
-  // これにより、カスタムホバーイベントが正しく発生します。
   hovermode: 'closest', 
   responsive: true
 };
@@ -142,7 +136,6 @@ function createDetailCardHtml(p) {
 
 // グラフ上の点にカーソルが合わさった時のイベント
 plotDiv.on('plotly_hover', function(data) {
-    // data.pointsが存在することをチェック（空白領域で発生した場合に備える）
     if (data.points && data.points.length > 0) {
         
         const pointIndex = data.points[0].pointIndex;
@@ -158,7 +151,6 @@ plotDiv.on('plotly_hover', function(data) {
         detailCard.style.display = 'block';
 
     } else {
-        // データ点にヒットしなかった場合は非表示にする
         hideDetailCard();
     }
 });
