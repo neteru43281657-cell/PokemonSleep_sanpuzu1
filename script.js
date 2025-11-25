@@ -1,22 +1,19 @@
 // --- 1. ポケモンデータの定義 ---
 
-// X軸データは共通（おてつだい時間）
-const commonAssistTime = [2800, 2400, 2800, 2650, 2800, 3100, 3000, 2200, 2900, 2650, 2800, 2400, 3500, 2600, 3400, 2500, 3100, 2700, 3200, 3000, 2700, 2950, 2400, 3400, 3000, 2900, 3200, 2800, 2800, 2500, 2700, 2600, 2700, 2600, 3500];
-
 // --- A. 食材タイプポケモンデータ (Y軸: 食材確率) ---
 const pokemonDataIngredient = [
     { name: "フシギバナ", file: "3.webp", skill: "食材ゲットS", assistTime: 2800, ingredientRate: 26.60, ingredientsText: "ミツ トマト ポテト" },
     { name: "リザードン", file: "6.webp", skill: "食材ゲットS", assistTime: 2400, ingredientRate: 22.40, ingredientsText: "ミート ジンジャー ハーブ" },
     { name: "カメックス", file: "9.webp", skill: "食材ゲットS", assistTime: 2800, ingredientRate: 27.50, ingredientsText: "ミルク カカオ ミート" },
-    { name: "ダグトリオ", file: "51.webp", skill: "エナジーチャージS（固定）", assistTime: 2650, ingredientRate: 19.00, ingredientsText: "トマト ねぎ マメ" },
+    { name: "ダグトリオ", file: "51.webp", skill: "エナジーチャージS(固定)", assistTime: 2650, ingredientRate: 19.00, ingredientsText: "トマト ねぎ マメ" },
     { name: "ウツボット", file: "71.webp", skill: "げんきチャージS", assistTime: 2800, ingredientRate: 23.30, ingredientsText: "トマト ポテト ねぎ" },
-    { name: "ゴローニャ", file: "76.webp", skill: "エナジーチャージS（ランダム）", assistTime: 3100, ingredientRate: 28.00, ingredientsText: "マメ ポテト きのこ" },
-    { name: "カモネギ", file: "83.webp", skill: "エナジーチャージS（固定）", assistTime: 3000, ingredientRate: 16.00, ingredientsText: "ねぎ ミート ジンジャー" },
-    { name: "ゲンガー", file: "94.webp", skill: "エナジーチャージS（ランダム）", assistTime: 2200, ingredientRate: 16.10, ingredientsText: "ハーブ きのこ オイル" },
+    { name: "ゴローニャ", file: "76.webp", skill: "エナジーチャージS(ランダム)", assistTime: 3100, ingredientRate: 28.00, ingredientsText: "マメ ポテト きのこ" },
+    { name: "カモネギ", file: "83.webp", skill: "エナジーチャージS(固定)", assistTime: 3000, ingredientRate: 16.00, ingredientsText: "ねぎ ミート ジンジャー" },
+    { name: "ゲンガー", file: "94.webp", skill: "エナジーチャージS(ランダム)", assistTime: 2200, ingredientRate: 16.10, ingredientsText: "ハーブ きのこ オイル" },
     { name: "ラッキー", file: "113-1.png", skill: "げんきオールS", assistTime: 2900, ingredientRate: 23.60, ingredientsText: "たまご ポテト ミツ" },
     { name: "ガルーラ", file: "115.webp", skill: "食材ゲットS", assistTime: 2650, ingredientRate: 22.20, ingredientsText: "ジンジャー ポテト マメ" },
     { name: "バリヤード", file: "122.webp", skill: "ものまね(スキルコピー)", assistTime: 2800, ingredientRate: 21.60, ingredientsText: "トマト ポテト ねぎ" },
-    { name: "カイロス", file: "127.webp", skill: "エナジーチャージS（固定）", assistTime: 2400, ingredientRate: 21.60, ingredientsText: "ミツ りんご ミート" },
+    { name: "カイロス", file: "127.webp", skill: "エナジーチャージS(固定)", assistTime: 2400, ingredientRate: 21.60, ingredientsText: "ミツ りんご ミート" },
     { name: "メタモン", file: "132.webp", skill: "へんしん(スキルコピー)", assistTime: 3500, ingredientRate: 20.10, ingredientsText: "オイル ねぎ しっぽ" },
     { name: "カイリュー", file: "149.webp", skill: "げんきチャージS", assistTime: 2600, ingredientRate: 26.40, ingredientsText: "ハーブ コーン オイル" },
     { name: "ヌオー", file: "195.webp", skill: "げんきチャージS", assistTime: 3400, ingredientRate: 19.00, ingredientsText: "きのこ ポテト ミート" },
@@ -25,15 +22,15 @@ const pokemonDataIngredient = [
     { name: "バンギラス", file: "248.webp", skill: "げんきチャージS", assistTime: 2700, ingredientRate: 26.60, ingredientsText: "ジンジャー マメ ミート" },
     { name: "クチート", file: "303.webp", skill: "かいりきバサミ(食材セレクトS)", assistTime: 3200, ingredientRate: 20.40, ingredientsText: "オイル コーン トマト" },
     { name: "ボスゴドラ", file: "306.webp", skill: "げんきチャージS", assistTime: 3000, ingredientRate: 28.50, ingredientsText: "ミート コーヒー マメ" },
-    { name: "フライゴン", file: "330.webp", skill: "エナジーチャージS（固定）", assistTime: 2700, ingredientRate: 17.20, ingredientsText: "アボカド ハーブ マメ" },
-    { name: "アブソル", file: "359.webp", skill: "エナジーチャージS（固定）", assistTime: 2950, ingredientRate: 17.80, ingredientsText: "カカオ りんご きのこ" },
+    { name: "フライゴン", file: "330.webp", skill: "エナジーチャージS(固定)", assistTime: 2700, ingredientRate: 17.20, ingredientsText: "アボカド ハーブ マメ" },
+    { name: "アブソル", file: "359.webp", skill: "エナジーチャージS(固定)", assistTime: 2950, ingredientRate: 17.80, ingredientsText: "カカオ りんご きのこ" },
     { name: "レントラー", file: "405.webp", skill: "料理パワーアップS", assistTime: 2400, ingredientRate: 20.00, ingredientsText: "トマト オイル コーヒー" },
-    { name: "ドクロッグ", file: "454.webp", skill: "エナジーチャージS（固定）", assistTime: 3400, ingredientRate: 22.90, ingredientsText: "オイル ミート" },
-    { name: "ユキノオー", file: "460.webp", skill: "エナジーチャージS（ランダム）", assistTime: 3000, ingredientRate: 25.00, ingredientsText: "トマト たまご きのこ" },
+    { name: "ドクロッグ", file: "454.webp", skill: "エナジーチャージS(固定)", assistTime: 3400, ingredientRate: 22.90, ingredientsText: "オイル ミート" },
+    { name: "ユキノオー", file: "460.webp", skill: "エナジーチャージS(ランダム)", assistTime: 3000, ingredientRate: 25.00, ingredientsText: "トマト たまご きのこ" },
     { name: "ダークライ", file: "491.webp", skill: "ナイトメア(エナジーチャージM)", assistTime: 2900, ingredientRate: 19.20, ingredientsText: "" }, 
-    { name: "パンプジン（中玉）", file: "711.webp", skill: "エナジーチャージS（固定）", assistTime: 3200, ingredientRate: 13.00, ingredientsText: "カボチャ マメ ポテト" },
-    { name: "クワガノン", file: "738.webp", skill: "エナジーチャージS（固定）", assistTime: 2800, ingredientRate: 19.40, ingredientsText: "コーヒー キノコ ミツ" },
-    { name: "キテルグマ", file: "760.webp", skill: "エナジーチャージS（ランダム）", assistTime: 2800, ingredientRate: 22.90, ingredientsText: "コーン ミート たまご" },
+    { name: "パンプジン（中玉）", file: "711.webp", skill: "エナジーチャージS(固定)", assistTime: 3200, ingredientRate: 13.00, ingredientsText: "カボチャ マメ ポテト" },
+    { name: "クワガノン", file: "738.webp", skill: "エナジーチャージS(固定)", assistTime: 2800, ingredientRate: 19.40, ingredientsText: "コーヒー キノコ ミツ" },
+    { name: "キテルグマ", file: "760.webp", skill: "エナジーチャージS(ランダム)", assistTime: 2800, ingredientRate: 22.90, ingredientsText: "コーン ミート たまご" },
     { name: "キュワワー", file: "764.webp", skill: "げんきエールS", assistTime: 2500, ingredientRate: 16.70, ingredientsText: "コーン ジンジャー カカオ" },
     { name: "ウッウ", file: "845.webp", skill: "料理チャンスS", assistTime: 2700, ingredientRate: 16.50, ingredientsText: "オイル ポテト たまご" },
     { name: "マスカーニャ", file: "908.webp", skill: "料理パワーアップS", assistTime: 2600, ingredientRate: 19.00, ingredientsText: "ポテト ミルク ジンジャー" },
@@ -99,8 +96,19 @@ const x_data_skill = pokemonDataSkill.map(p => p.assistTime);
 const y_data_skill = pokemonDataSkill.map(p => p.skillRate);
 const pokemon_names_skill = pokemonDataSkill.map(p => p.name);
 
+// 全てのデータを統合したマップ（ホバー用）
+const allPokemonData = {
+    ingredient: pokemonDataIngredient,
+    skill: pokemonDataSkill
+};
+
 
 // --- 2. グラフ設定の定義 ---
+
+// 食材タイプの色 (見やすいオレンジ)
+const COLOR_INGREDIENT = 'rgb(255, 165, 0)'; 
+// スキルタイプの色 (見やすい青)
+const COLOR_SKILL = 'rgb(0, 150, 255)';
 
 // 共通のトレース設定
 const commonTrace = {
@@ -130,7 +138,7 @@ const traceIngredient = {
     x: x_data_ingredient,
     y: y_data_ingredient,
     text: pokemon_names_ingredient,
-    marker: {...commonTrace.marker, color: 'rgb(50, 100, 200)'} // 青系
+    marker: {...commonTrace.marker, color: COLOR_INGREDIENT} 
 };
 
 // スキルタイプグラフのトレース
@@ -139,7 +147,7 @@ const traceSkill = {
     x: x_data_skill,
     y: y_data_skill,
     text: pokemon_names_skill,
-    marker: {...commonTrace.marker, color: 'rgb(255, 99, 71)'} // 赤系
+    marker: {...commonTrace.marker, color: COLOR_SKILL} 
 };
 
 
@@ -154,13 +162,13 @@ const commonLayout = {
 // 食材タイプグラフのレイアウト
 const layoutIngredient = {
     ...commonLayout,
+    // タイトルを修正
     title: {
-        text: '散布図_食材タイプ (Y軸: 食材確率)',
-        font: { size: 26, color: '#2a6496' }
+        text: '散布図_食材タイプ',
+        font: { size: 26, color: COLOR_INGREDIENT } // 色をオレンジに変更
     },
     xaxis: {
         title: { text: 'おてつだい時間 (秒)', font: { size: 18 } },
-        // 食材タイプデータの範囲に合わせる
         range: [2000, Math.max(...x_data_ingredient) * 1.05],
         rangemode: 'tozero', 
         tickfont: { size: 14 },
@@ -181,13 +189,13 @@ const layoutIngredient = {
 // スキルタイプグラフのレイアウト
 const layoutSkill = {
     ...commonLayout,
+    // タイトルを修正
     title: {
-        text: '散布図_スキルタイプ (Y軸: スキル確率)',
-        font: { size: 26, color: 'rgb(255, 99, 71)' }
+        text: '散布図_スキルタイプ',
+        font: { size: 26, color: COLOR_SKILL } // 色を青に変更
     },
     xaxis: {
         title: { text: 'おてつだい時間 (秒)', font: { size: 18 } },
-        // スキルタイプデータの範囲に合わせる
         range: [2000, Math.max(...x_data_skill) * 1.05],
         rangemode: 'tozero', 
         tickfont: { size: 14 },
@@ -196,7 +204,6 @@ const layoutSkill = {
     },
     yaxis: {
         title: { text: 'スキル確率 (%)', font: { size: 18 } },
-        // スキル確率のデータ範囲に合わせる（最小値は0に設定）
         range: [0, Math.max(...y_data_skill) * 1.1],
         rangemode: 'tozero',
         tickfont: { size: 14 },
@@ -215,12 +222,6 @@ const config = {
 
 // --- 3. グラフ描画とタブ切り替えロジック ---
 
-// 全てのデータを統合したマップ（ホバー用）
-const allPokemonData = {
-    ingredient: pokemonDataIngredient,
-    skill: pokemonDataSkill
-};
-
 // グラフ描画関数
 function plotGraph(type) {
     const plotDivId = `scatter-plot-${type}`;
@@ -237,7 +238,6 @@ function plotGraph(type) {
         plotDiv.on('plotly_unhover', hideDetailCard);
         plotDiv.on('plotly_click', hideDetailCard);
     } else {
-        // 既に描画済みの場合は、画面サイズに合わせて再配置 (Plotlyの推奨)
         Plotly.relayout(plotDiv, layout);
     }
 }
@@ -261,7 +261,7 @@ window.openTab = function(tabName) {
     hideDetailCard();
 }
 
-// 初期表示: 食材確率グラフを表示
+// 初期表示: 食材タイプグラフを表示
 window.onload = function() {
     window.openTab('ingredient');
 };
@@ -279,16 +279,21 @@ function createDetailCardHtml(p, type) {
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
     const ingredientImagesHtml = ingredients.map(ing => {
-        // ウッウの'エッグ'は、既存の食材画像ファイル名に合わせて'たまご'に変換
-        const ingName = ing === 'エッグ' ? 'たまご' : ing; 
-        const ingImagePath = `./images/${ingName}.webp`; 
-        return `<img src="${ingImagePath}" alt="${ingName}" title="${ingName}">`;
+        // ウッウの'たまご'は、食材画像ファイル名に合わせて調整（前回修正済み）
+        const ingImagePath = `./images/${ing}.webp`; 
+        return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
     }).join('');
 
     // 表示するY軸のデータとラベルを決定
     const yValue = type === 'ingredient' ? `${p.ingredientRate}%` : `${p.skillRate}%`;
     const yLabel = type === 'ingredient' ? '食材確率' : 'スキル確率';
-    const yKey = type === 'ingredient' ? 'ingredientRate' : 'skillRate'; // データ取得用
+
+    // カスタムカード内の色をグラフの色と合わせる
+    const cardColor = type === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
+
+    // detail-card h3のスタイルを一時的に変更
+    detailCard.querySelector('h3').style.color = cardColor;
+
 
     return `
         <h3>${p.name}</h3>
@@ -309,15 +314,20 @@ function handlePlotlyHover(data) {
         const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
         
         const pointIndex = data.points[0].pointIndex;
-        // 参照するデータ配列を切り替える
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
 
-        // ホバー座標を取得
         const xPos = data.event.clientX;
         const yPos = data.event.clientY;
-
+        
+        // カードのHTMLを生成・設定
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         
+        // カスタムカード内の色をグラフの色と合わせる
+        const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
+        detailCard.style.borderColor = cardColor;
+        detailCard.querySelector('h3').style.color = cardColor;
+
+
         detailCard.style.top = `${yPos + 15}px`; 
         detailCard.style.left = `${xPos + 15}px`; 
         detailCard.style.display = 'block';
@@ -329,4 +339,6 @@ function handlePlotlyHover(data) {
 
 function hideDetailCard() {
     detailCard.style.display = 'none';
+    // カードが非表示になったら、色をリセット（次のホバー時に再設定されるため必須ではないが、クリーンな状態を保つ）
+    detailCard.style.borderColor = '#333';
 }
