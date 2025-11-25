@@ -213,12 +213,22 @@ const layoutSkill = {
 
 const config = {
     displayModeBar: true, 
+    // ★修正ポイント★: ピンチイン/ピンチアウト操作に対応
     scrollZoom: true,
-    displaylogo: false
+    displaylogo: false,
+    modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+    // ズームモードをピンチ操作に設定
+    touchmode: 'pinch', 
 };
 
 
 // --- 3. グラフ描画とタブ切り替えロジック ---
+
+// 共通のレイアウト定義（元の俯瞰図に戻すために使用）
+let initialLayout = {
+    ingredient: null,
+    skill: null
+};
 
 // グラフ描画関数
 function plotGraph(type) {
@@ -229,12 +239,21 @@ function plotGraph(type) {
     const plotDiv = document.getElementById(plotDivId);
 
     if (!plotDiv._plotly_data) {
-        Plotly.newPlot(plotDiv, [trace], layout, config);
+        Plotly.newPlot(plotDiv, [trace], layout, config).then(() => {
+             // 最初の描画時に、元の全体レイアウトを保存しておく
+            initialLayout[type] = JSON.parse(JSON.stringify(layout));
+        });
         
-        // 描画されたグラフにホバーイベントを設定
-        plotDiv.on('plotly_hover', handlePlotlyHover);
-        plotDiv.on('plotly_unhover', hideDetailCard);
-        plotDiv.on('plotly_click', hideDetailCard);
+        // 描画されたグラフにイベントを設定
+        plotDiv.on('plotly_hover', handlePlotlyHover); // PC用
+        plotDiv.on('plotly_unhover', hideDetailCard); // PC用
+        
+        // ★修正ポイント★: タップ/クリックでカード表示とズーム
+        plotDiv.on('plotly_click', handlePlotlyClick); 
+        
+        // ★修正ポイント★: ダブルタップでズームリセット
+        plotDiv.on('plotly_doubleclick', handlePlotlyDoubleClick);
+        
     } else {
         Plotly.relayout(plotDiv, layout);
     }
@@ -268,6 +287,7 @@ window.onload = function() {
 // --- 4. カスタム詳細情報カードの実装 (共通ロジック) ---
 
 const detailCard = document.getElementById('detail-card');
+let clickTimer = null; // ダブルクリック判定用
 
 /**
  * 詳細情報カードのHTMLを生成する関数
@@ -296,8 +316,11 @@ function createDetailCardHtml(p, type) {
     `;
 }
 
-// グラフ上の点にカーソルが合わさった時のイベントハンドラ
+// PCでのホバーイベント（PCではホバーは維持）
 function handlePlotlyHover(data) {
+    // 既にタップで表示されている場合は、ホバーイベントを無視する (二重表示防止)
+    if (detailCard.style.display === 'block') return;
+
     if (data.points && data.points.length > 0) {
         
         const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
@@ -308,20 +331,14 @@ function handlePlotlyHover(data) {
         const xPos = data.event.clientX;
         const yPos = data.event.clientY;
         
-        // 1. カードのHTMLを生成・設定
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         
-        // 2. カード内の要素の色を再設定 (★修正ポイント★: innerHTML設定後に行う)
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
         
-        // detailCard.querySelector('h3') が有効な要素を参照できるように、innerHTML設定後に呼び出す
         const cardTitle = detailCard.querySelector('h3');
-        if(cardTitle) {
-             cardTitle.style.color = cardColor;
-        }
+        if(cardTitle) { cardTitle.style.color = cardColor; }
 
-        // 3. カードの位置を設定し、表示
         detailCard.style.top = `${yPos + 15}px`; 
         detailCard.style.left = `${xPos + 15}px`; 
         detailCard.style.display = 'block';
@@ -331,8 +348,84 @@ function handlePlotlyHover(data) {
     }
 }
 
+
+// ★修正ポイント★: シングルタップ/クリック時の処理
+function handlePlotlyClick(data) {
+    // データポイント上でのクリックかどうかを確認
+    if (data.points && data.points.length > 0) {
+        
+        // ダブルクリック判定のためのタイマー設定
+        if (clickTimer) {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            // 300ms以内に2回目のクリックが発生した場合は、ダブルクリックイベントに任せる
+            return;
+        }
+
+        const pointIndex = data.points[0].pointIndex;
+        const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
+        const hoveredPokemon = allPokemonData[activeTab][pointIndex];
+        const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
+
+        // 1. カード表示（位置はポイントの上に固定）
+        const xPos = data.event.clientX;
+        const yPos = data.event.clientY;
+        
+        detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
+        const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
+        detailCard.style.borderColor = cardColor;
+        const cardTitle = detailCard.querySelector('h3');
+        if(cardTitle) { cardTitle.style.color = cardColor; }
+
+        // ポケモンがタップされた場所にカードを配置
+        detailCard.style.top = `${yPos + 15}px`; 
+        detailCard.style.left = `${xPos + 15}px`; 
+        detailCard.style.display = 'block';
+
+        // 2. ズーム操作（該当ポケモンを中心にする）
+        // x軸は前後500秒、y軸は前後10%程度にズーム
+        const newLayout = {
+            'xaxis.range': [data.points[0].x - 500, data.points[0].x + 500],
+            'yaxis.range': [data.points[0].y * 0.9, data.points[0].y * 1.1] 
+        };
+        Plotly.relayout(plotDiv, newLayout);
+        
+        // 3. ダブルクリック判定用のタイマーを開始
+        clickTimer = setTimeout(() => {
+            clickTimer = null;
+        }, 300); // 300ms以内に2回目のクリックがなければシングルクリックとみなす
+        
+    } else {
+        // 点以外をタップした場合は、カードを非表示にする
+        hideDetailCard();
+    }
+}
+
+// ★修正ポイント★: ダブルタップ時の処理（全体表示に戻す）
+function handlePlotlyDoubleClick(data) {
+    // デフォルトのダブルクリック動作（ズームリセット）を防止
+    Plotly.d3.event.preventDefault(); 
+    
+    // カードを非表示
+    hideDetailCard();
+    
+    const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
+    const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
+    
+    // 最初に保存した全体レイアウトに戻す
+    if (initialLayout[activeTab]) {
+        Plotly.relayout(plotDiv, {
+            'xaxis.range': initialLayout[activeTab].xaxis.range,
+            'yaxis.range': initialLayout[activeTab].yaxis.range
+        });
+    } else {
+        // もしinitialLayoutが保存されていなければ、Plotlyの標準リセットを実行（保険）
+        Plotly.relayout(plotDiv, {'xaxis.autorange': true, 'yaxis.autorange': true});
+    }
+}
+
+
 function hideDetailCard() {
     detailCard.style.display = 'none';
-    // カードが非表示になったら、色をリセット（次のホバー時のために念のため実行）
     detailCard.style.borderColor = '#333';
 }
