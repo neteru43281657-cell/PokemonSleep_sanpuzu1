@@ -213,15 +213,14 @@ const layoutSkill = {
 
 const config = {
     displayModeBar: true, 
-    scrollZoom: true,
+    // ★修正ポイント★: Plotlyの内部ズーム(マウスホイール/トラックパッド)を無効化
+    scrollZoom: false,
     displaylogo: false,
     // 不要なボタンを非表示
     modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ★修正ポイント★: タッチモードを pinch に設定し、2本指ズームを有効化
+    // ★修正ポイント★: タッチモードを pinch に設定し、2本指ズーム(ブラウザ機能)を誘導
     touchmode: 'pinch', 
-    // ★修正ポイント★: Plotlyのデフォルトのダブルクリック動作(ズームリセット)を無効化
-    // これにより、カスタムのダブルクリックイベント (handlePlotlyDoubleClick) が正常に機能し、
-    // かつ pinch/2本指ズームが干渉なく動作します。
+    // Plotlyのデフォルトのダブルクリック動作(ズームリセット)を無効化
     doubleClick: 'false', 
 };
 
@@ -372,19 +371,19 @@ function handlePlotlyClick(data) {
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
         const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
-        // 1. カード表示（位置を画面中央上部に統一）
+        // 1. カード表示（位置を画面中央下部に統一）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
         const cardTitle = detailCard.querySelector('h3');
         if(cardTitle) { cardTitle.style.color = cardColor; }
 
-        // ★修正ポイント★: カードの位置を画面に対して固定する
-        // 画面の幅の50%の位置に中央揃え
+        // ★修正ポイント★: カードの位置を画面中央下部に固定する (画面上から75%の位置、中央揃え)
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         
-        detailCard.style.top = `10vh`; // 画面の上から10%の位置
-        detailCard.style.left = `${(viewportWidth / 2) - 100}px`; // カードの幅を200pxと仮定して中央寄せ
+        detailCard.style.top = `75vh`; // 画面の上から75%の位置
+        // カードの最大幅が200pxなので、その半分(100px)を引いて中央寄せ
+        detailCard.style.left = `${(viewportWidth / 2) - 100}px`; 
         detailCard.style.display = 'block';
 
         // 2. ズーム操作（該当ポケモンを中心にする）
