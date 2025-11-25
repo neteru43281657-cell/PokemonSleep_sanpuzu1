@@ -1,104 +1,73 @@
-// --- 1. ポケモンデータの定義 (変更なし) ---
-const pokemonData = [
-    // [名前, ファイル名, お手伝い時間(秒), 食材確率(%), 食材リスト(スペース区切り)]
-    { name: "フシギバナ", file: "3.webp", assistTime: 2800, ingredientRate: 26.60, ingredientsText: "ミツ トマト ポテト" },
-    { name: "リザードン", file: "6.webp", assistTime: 2400, ingredientRate: 22.40, ingredientsText: "ミート ジンジャー ハーブ" },
-    { name: "カメックス", file: "9.webp", assistTime: 2800, ingredientRate: 27.50, ingredientsText: "ミルク カカオ ミート" },
-    { name: "ダグトリオ", file: "51.webp", assistTime: 2650, ingredientRate: 19.00, ingredientsText: "トマト ねぎ マメ" }, // ねぎに修正
-    { name: "ウツボット", file: "71.webp", assistTime: 2800, ingredientRate: 23.30, ingredientsText: "トマト ポテト ねぎ" }, // ねぎに修正
-    { name: "ゴローニャ", file: "76.webp", assistTime: 3100, ingredientRate: 28.00, ingredientsText: "マメ ポテト きのこ" },
-    { name: "カモネギ", file: "83.webp", assistTime: 3000, ingredientRate: 16.00, ingredientsText: "ねぎ ミート ジンジャー" }, // ねぎに修正
-    { name: "ゲンガー", file: "94.webp", assistTime: 2200, ingredientRate: 16.10, ingredientsText: "ハーブ きのこ オイル" },
-    { name: "ラッキー", file: "113-1.png", assistTime: 2900, ingredientRate: 23.60, ingredientsText: "たまご ポテト ミツ" },
-    { name: "ガルーラ", file: "115.webp", assistTime: 2650, ingredientRate: 22.20, ingredientsText: "ジンジャー ポテト マメ" },
-    { name: "バリヤード", file: "122.webp", assistTime: 2800, ingredientRate: 21.60, ingredientsText: "トマト ポテト ねぎ" }, // ねぎに修正
-    { name: "カイロス", file: "127.webp", assistTime: 2400, ingredientRate: 21.60, ingredientsText: "ミツ りんご ミート" },
-    { name: "メタモン", file: "132.webp", assistTime: 3500, ingredientRate: 20.10, ingredientsText: "オイル ねぎ しっぽ" }, // ねぎに修正
-    { name: "カイリュー", file: "149.webp", assistTime: 2600, ingredientRate: 26.40, ingredientsText: "ハーブ コーン オイル" },
-    { name: "ヌオー", file: "195.webp", assistTime: 3400, ingredientRate: 19.00, ingredientsText: "きのこ ポテト ミート" },
-    { name: "デリバード", file: "225.webp", assistTime: 2500, ingredientRate: 18.80, ingredientsText: "たまご りんご カカオ" },
-    { name: "ハピナス", file: "242.webp", assistTime: 3100, ingredientRate: 23.80, ingredientsText: "たまご ポテト ミツ" },
-    { name: "バンギラス", file: "248.webp", assistTime: 2700, ingredientRate: 26.60, ingredientsText: "ジンジャー マメ ミート" },
-    { name: "クチート", file: "303.webp", assistTime: 3200, ingredientRate: 20.40, ingredientsText: "オイル コーン トマト" },
-    { name: "ボスゴドラ", file: "306.webp", assistTime: 3000, ingredientRate: 28.50, ingredientsText: "ミート コーヒー マメ" },
-    { name: "フライゴン", file: "330.webp", assistTime: 2700, ingredientRate: 17.20, ingredientsText: "アボカド ハーブ マメ" },
-    { name: "アブソル", file: "359.webp", assistTime: 2950, ingredientRate: 17.80, ingredientsText: "カカオ りんご きのこ" },
-    { name: "レントラー", file: "405.webp", assistTime: 2400, ingredientRate: 20.00, ingredientsText: "トマト オイル コーヒー" },
-    { name: "ドクロッグ", file: "454.webp", assistTime: 3400, ingredientRate: 22.90, ingredientsText: "オイル ミート" },
-    { name: "ユキノオー", file: "460.webp", assistTime: 3000, ingredientRate: 25.00, ingredientsText: "トマト たまご きのこ" },
-    { name: "ダークライ", file: "491.webp", assistTime: 2900, ingredientRate: 19.20, ingredientsText: "" }, // 食材なし
-    { name: "パンプジン（中玉）", file: "711.webp", assistTime: 3200, ingredientRate: 13.00, ingredientsText: "カボチャ マメ ポテト" },
-    { name: "クワガノン", file: "738.webp", assistTime: 2800, ingredientRate: 19.40, ingredientsText: "コーヒー きのこ ミツ" },
-    { name: "キテルグマ", file: "760.webp", assistTime: 2800, ingredientRate: 22.90, ingredientsText: "コーン ミート たまご" },
-    { name: "キュワワー", file: "764.webp", assistTime: 2500, ingredientRate: 16.70, ingredientsText: "コーン ジンジャー カカオ" },
-    { name: "ウッウ", file: "845.webp", assistTime: 2700, ingredientRate: 16.50, ingredientsText: "オイル ポテト たまご" }, // エッグをたまごに修正
-    { name: "マスカーニャ", file: "908.webp", assistTime: 2600, ingredientRate: 19.00, ingredientsText: "ポテト ミルク ジンジャー" },
-    { name: "ラウドボーン", file: "911.webp", assistTime: 2700, ingredientRate: 26.80, ingredientsText: "りんご ミート ハーブ" }, // リンゴをりんごに修正
-    { name: "ウェーニバル", file: "914.webp", assistTime: 2600, ingredientRate: 23.20, ingredientsText: "マメ ねぎ オイル" }, // ねぎに修正
-    { name: "ドオー", file: "980.webp", assistTime: 3500, ingredientRate: 20.80, ingredientsText: "カカオ コーヒー ポテト" },
-];
-// (Plotly関連の x_data, y_data, text_data, trace, layout, Plotly.newPlot の定義は変更なし)
-
-// --- 2. グラフの設定 (変更なし) ---
-const x_data = pokemonData.map(p => p.assistTime);
-const y_data = pokemonData.map(p => p.ingredientRate);
-const text_data = pokemonData.map(p => `${p.name}<br>おてつだい時間: ${p.assistTime}秒<br>食材確率: ${p.ingredientRate}%`);
-
-const trace = { /* ... (設定は前回と同じ) ... */ };
-const layout = { /* ... (設定は前回と同じ) ... */ };
-const plotDiv = document.getElementById('scatter-plot');
-Plotly.newPlot(plotDiv, [trace], layout, { displayModeBar: true, scrollZoom: true });
-
-
-// --- 3. カスタム詳細情報カードの実装 (この部分を修正) ---
-
-const detailCard = document.getElementById('detail-card');
-
-/**
- * 詳細情報カードのHTMLを生成する関数
- * @param {object} p - ポケモンデータオブジェクト
- */
-function createDetailCardHtml(p) {
-    // ポケモン画像パス: images/ファイル名 (変更なし)
-    const pokemonImagePath = `./images/${p.file}`; 
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン散布図</title>
     
-    // 食材リストを分割
-    const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <style>
+        /* グラフのレスポンシブ対応とスタイリング */
+        #scatter-plot {
+            width: 95vw; /* 画面幅の95% */
+            height: 90vh; /* 画面高さの90% */
+            margin: 20px auto;
+        }
 
-    // ★★★ 修正箇所: 食材画像のパスを images/食材名.webp に変更 ★★★
-    const ingredientImagesHtml = ingredients.map(ing => {
-        // 食材画像パス: images/食材名.webp
-        const ingImagePath = `./images/${ing}.webp`; 
-        return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
-    }).join('');
-    // ★★★ 修正箇所 終わり ★★★
+        /* 詳細情報カード（カスタムツールチップ）のスタイル */
+        #detail-card {
+            position: absolute;
+            background-color: #ffffff;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            z-index: 100; /* 最前面に表示 */
+            pointer-events: none; /* マウスイベントを透過させる */
+            display: none; /* 初期状態では非表示 */
+            max-width: 200px;
+            font-family: sans-serif;
+        }
+        #detail-card h3 {
+            margin-top: 0;
+            color: #2a6496;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        #pokemon-image {
+            display: block;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px auto;
+            border: 1px solid #eee;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+        .ingredient-images {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 5px;
+        }
+        .ingredient-images img {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            object-fit: contain;
+            background-color: #f7f7f7; /* 食材が見やすいように薄い背景色を設定 */
+        }
+    </style>
+</head>
+<body>
 
-    return `
-        <h3>${p.name}</h3>
-        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}">
-        <p><strong>おてつだい時間:</strong> ${p.assistTime} 秒</p>
-        <p><strong>食材確率:</strong> ${p.ingredientRate}%</p>
-        <p><strong>持ってくる食材:</strong></p>
-        <div class="ingredient-images">${ingredientImagesHtml || 'なし'}</div>
-    `;
-}
+    <div id="scatter-plot"></div>
 
-// (plotly_hover, plotly_unhover, plotly_click のイベント処理は変更なし)
-plotDiv.on('plotly_hover', function(data) {
-    // ... (ホバー処理) ...
-    const pointIndex = data.points[0].pointIndex;
-    const hoveredPokemon = pokemonData[pointIndex];
-    const xPos = data.event.clientX;
-    const yPos = data.event.clientY;
+    <div id="detail-card"></div>
+    
+    <script src="script.js"></script>
 
-    detailCard.innerHTML = createDetailCardHtml(hoveredPokemon);
-    detailCard.style.top = `${yPos + 15}px`; 
-    detailCard.style.left = `${xPos + 15}px`; 
-    detailCard.style.display = 'block';
-});
-
-function hideDetailCard() {
-    detailCard.style.display = 'none';
-}
-plotDiv.on('plotly_unhover', hideDetailCard);
-plotDiv.on('plotly_click', function(data) { /* ... (クリック処理) ... */ });
+</body>
+</html>
