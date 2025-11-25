@@ -213,14 +213,14 @@ const layoutSkill = {
 
 const config = {
     displayModeBar: true, 
-    // ★修正ポイント★: Plotlyの内部ズーム(マウスホイール/トラックパッド)を無効化
-    scrollZoom: false,
+    // ★重要修正★: Plotlyの内部ズームを完全に無効化し、モバイルのネイティブピンチズームに任せる
+    scrollZoom: false, // マウスホイール/トラックパッドによるズームを無効化
     displaylogo: false,
-    // 不要なボタンを非表示
     modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ★修正ポイント★: タッチモードを pinch に設定し、2本指ズーム(ブラウザ機能)を誘導
-    touchmode: 'pinch', 
-    // Plotlyのデフォルトのダブルクリック動作(ズームリセット)を無効化
+    // ★重要修正★: タッチモードを 'pan' に変更。これにより、Plotlyの矩形ズーム（四角形）が発動するのを防ぎ、
+    // グラフのパン操作（移動）に特化させ、ピンチ操作はブラウザのネイティブズームに委ねる。
+    touchmode: 'pan', 
+    // Plotlyのデフォルトのダブルクリック動作(ズームリセット)を無効化 (カスタムのダブルタップに必要)
     doubleClick: 'false', 
 };
 
@@ -371,17 +371,19 @@ function handlePlotlyClick(data) {
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
         const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
-        // 1. カード表示（位置を画面中央下部に統一）
+        // 1. カード表示（位置をグラフエリアの中央下部に統一）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
         const cardTitle = detailCard.querySelector('h3');
         if(cardTitle) { cardTitle.style.color = cardColor; }
 
-        // ★修正ポイント★: カードの位置を画面中央下部に固定する (画面上から75%の位置、中央揃え)
+        // ★重要修正★: カードの位置をグラフエリアの底部（上から約 80%）に固定する
+        // 画面の幅の50%の位置に中央揃え
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         
-        detailCard.style.top = `75vh`; // 画面の上から75%の位置
+        // グラフエリアは縦85vhなので、その中の底部(約80%)に固定
+        detailCard.style.top = `80vh`; 
         // カードの最大幅が200pxなので、その半分(100px)を引いて中央寄せ
         detailCard.style.left = `${(viewportWidth / 2) - 100}px`; 
         detailCard.style.display = 'block';
@@ -407,8 +409,6 @@ function handlePlotlyClick(data) {
 
 // ダブルタップ時の処理（全体表示に戻す）
 function handlePlotlyDoubleClick(data) {
-    // Plotlyのデフォルトダブルクリック動作はconfigで無効化済み
-    
     // カードを非表示
     hideDetailCard();
     
