@@ -17,12 +17,10 @@
         .scatter-plot {
             width: 100%;
             height: 100%;
-            /* ★最重要修正 4★: touch-action: none を削除。ブラウザのデフォルトピンチズームをブロックしないようにする。
-               これにより、Plotlyのズーム設定が無効であれば、2本指操作はブラウザのズームとして機能するはずです。 */
-            /* touch-action: none; を削除 */
+            /* touch-action: none; を削除してブラウザ標準のピンチズームを許可 */
         }
 
-        /* --- タブスタイリング (変更なし) --- */
+        /* --- タブスタイリング --- */
         .tab-button-container {
             width: 95vw;
             margin: 10px auto 0 auto;
@@ -60,20 +58,19 @@
             background-color: #ffffff;
             border: 2px solid #333;
             border-radius: 8px;
-            padding: 5px; /* ★重要修正 5★: パディングをさらに縮小 */
+            padding: 5px;
             box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
             z-index: 100;
             display: none;
             max-width: 100px; 
             font-family: sans-serif;
             text-align: center;
-            line-height: 1.1; /* 行間をさらに詰める */
-            font-size: 10px; /* 全体的な文字サイズを小さくする */
+            line-height: 1.1;
+            font-size: 10px;
         }
         #detail-card h3 {
             margin-top: 0;
             color: #2a6496;
-            /* 境界線を細く */
             border-bottom: 1px solid #ddd;
             padding-bottom: 2px;
             margin-bottom: 3px;
@@ -95,14 +92,14 @@
             margin-top: 3px;
         }
         .ingredient-images img {
-            width: 18px; /* 食材アイコンをさらに縮小 */
+            width: 18px;
             height: 18px;
             border-radius: 4px;
             object-fit: contain;
             background-color: #f7f7f7;
         }
         
-        /* --- 出典スタイリング (変更なし) --- */
+        /* --- 出典スタイリング --- */
         #source-info {
             width: 95vw;
             margin: 10px auto 20px auto;
