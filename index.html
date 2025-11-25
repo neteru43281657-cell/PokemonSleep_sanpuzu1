@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ポケモン散布図</title>
     
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script> 
     
     <style>
         /* グラフのレスポンシブ対応とスタイリング */
         #scatter-plot {
-            width: 95vw; /* 画面幅の95% */
-            height: 90vh; /* 画面高さの90% */
+            width: 95vw;
+            height: 90vh;
             margin: 20px auto;
         }
 
@@ -23,9 +23,9 @@
             border-radius: 8px;
             padding: 15px;
             box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
-            z-index: 100; /* 最前面に表示 */
+            z-index: 100;
             pointer-events: none; /* マウスイベントを透過させる */
-            display: none; /* 初期状態では非表示 */
+            display: none;
             max-width: 200px;
             font-family: sans-serif;
         }
@@ -57,7 +57,7 @@
             height: 30px;
             border-radius: 4px;
             object-fit: contain;
-            background-color: #f7f7f7; /* 食材が見やすいように薄い背景色を設定 */
+            background-color: #f7f7f7;
         }
     </style>
 </head>
