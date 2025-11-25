@@ -1,1 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pokemon Sleep 食材散布図</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+    }
+    header {
+      padding: 12px 16px;
+      background: #4caf50;
+      color: #fff;
+      font-weight: bold;
+    }
+    main {
+      padding: 8px 8px 24px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    #chart {
+      width: 100%;
+      height: 60vh;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    #pokemon-card {
+      margin-top: 16px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 16px;
+    }
+    .card-inner {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    @media (max-width: 640px) {
+      .card-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    .pokemon-sprite {
+      width: 120px;
+      height: auto;
+    }
+    .ingredient-icon {
+      height: 32px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Pokemon Sleep 食材散布図（お手伝い時間 × 食材確率）
+  </header>
+  <main>
+    <div id="chart"></div>
+    <div id="pokemon-card"></div>
+  </main>
 
+  <script>
+    // ▼ ポケモンデータ（睡眠タイプなし）
+    const pokemonData = [
+      {
+        name: "フシギバナ",
+        sprite: "images/3.webp",
+        workTimeSec: 2800,
+        ingredientRate: 26.60,
+        ingredients: [
+          { label: "ミツ", icon: "images/ミツ.webp" },
+          { label: "トマト", icon: "images/トマト.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" }
+        ]
+      },
+      {
+        name: "リザードン",
+        sprite: "images/6.webp",
+        workTimeSec: 2400,
+        ingredientRate: 22.40,
+        ingredients: [
+          { label: "ミート", icon: "images/ミート.webp" },
+          { label: "ジンジャー", icon: "images/ジンジャー.webp" },
+          { label: "ハーブ", icon: "images/ハーブ.webp" }
+        ]
+      },
+      {
+        name: "カメックス",
+        sprite: "images/9.webp",
+        workTimeSec: 2800,
+        ingredientRate: 27.50,
+        ingredients: [
+          { label: "ミルク", icon: "images/ミルク.webp" },
+          { label: "カカオ", icon: "images/カカオ.webp" },
+          { label: "ミート", icon: "images/ミート.webp" }
+        ]
+      },
+      {
+        name: "ダグトリオ",
+        sprite: "images/51.webp",
+        workTimeSec: 2650,
+        ingredientRate: 19.00,
+        ingredients: [
+          { label: "トマト", icon: "images/トマト.webp" },
+          { label: "ネギ", icon: "images/ねぎ.webp" },
+          { label: "マメ", icon: "images/マメ.webp" }
+        ]
+      },
+      {
+        name: "ウツボット",
+        sprite: "images/71.webp",
+        workTimeSec: 2800,
+        ingredientRate: 23.30,
+        ingredients: [
+          { label: "トマト", icon: "images/トマト.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "ネギ", icon: "images/ねぎ.webp" }
+        ]
+      },
+      {
+        name: "ゴローニャ",
+        sprite: "images/76.webp",
+        workTimeSec: 3100,
+        ingredientRate: 28.00,
+        ingredients: [
+          { label: "マメ", icon: "images/マメ.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "きのこ", icon: "images/きのこ.webp" }
+        ]
+      },
+      {
+        name: "カモネギ",
+        sprite: "images/83.webp",
+        workTimeSec: 3000,
+        ingredientRate: 16.00,
+        ingredients: [
+          { label: "ネギ", icon: "images/ねぎ.webp" },
+          { label: "ミート", icon: "images/ミート.webp" },
+          { label: "ジンジャー", icon: "images/ジンジャー.webp" }
+        ]
+      },
+      {
+        name: "ゲンガー",
+        sprite: "images/94.webp",
+        workTimeSec: 2200,
+        ingredientRate: 16.10,
+        ingredients: [
+          { label: "ハーブ", icon: "images/ハーブ.webp" },
+          { label: "きのこ", icon: "images/きのこ.webp" },
+          { label: "オイル", icon: "images/オイル.webp" }
+        ]
+      },
+      {
+        name: "ラッキー（2000h）",
+        sprite: "images/113-1.png",
+        workTimeSec: 2900,
+        ingredientRate: 23.60,
+        ingredients: [
+          { label: "たまご", icon: "images/たまご.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "ミツ", icon: "images/ミツ.webp" }
+        ]
+      },
+      {
+        name: "ガルーラ",
+        sprite: "images/115.webp",
+        workTimeSec: 2650,
+        ingredientRate: 22.20,
+        ingredients: [
+          { label: "ジンジャー", icon: "images/ジンジャー.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "マメ", icon: "images/マメ.webp" }
+        ]
+      },
+      {
+        name: "バリヤード",
+        sprite: "images/122.webp",
+        workTimeSec: 2800,
+        ingredientRate: 21.60,
+        ingredients: [
+          { label: "トマト", icon: "images/トマト.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "ネギ", icon: "images/ねぎ.webp" }
+        ]
+      },
+      {
+        name: "カイロス",
+        sprite: "images/127.webp",
+        workTimeSec: 2400,
+        ingredientRate: 21.60,
+        ingredients: [
+          { label: "ミツ", icon: "images/ミツ.webp" },
+          { label: "りんご", icon: "images/りんご.webp" },
+          { label: "ミート", icon: "images/ミート.webp" }
+        ]
+      },
+      {
+        name: "メタモン",
+        sprite: "images/132.webp",
+        workTimeSec: 3500,
+        ingredientRate: 20.10,
+        ingredients: [
+          { label: "オイル", icon: "images/オイル.webp" },
+          { label: "ネギ", icon: "images/ねぎ.webp" },
+          { label: "しっぽ", icon: "images/しっぽ.webp" }
+        ]
+      },
+      {
+        name: "カイリュー",
+        sprite: "images/149.webp",
+        workTimeSec: 2600,
+        ingredientRate: 26.40,
+        ingredients: [
+          { label: "ハーブ", icon: "images/ハーブ.webp" },
+          { label: "コーン", icon: "images/コーン.webp" },
+          { label: "オイル", icon: "images/オイル.webp" }
+        ]
+      },
+      {
+        name: "ヌオー",
+        sprite: "images/195.webp",
+        workTimeSec: 3400,
+        ingredientRate: 19.00,
+        ingredients: [
+          { label: "きのこ", icon: "images/きのこ.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "ミート", icon: "images/ミート.webp" }
+        ]
+      },
+      {
+        name: "デリバード",
+        sprite: "images/225.webp",
+        workTimeSec: 2500,
+        ingredientRate: 18.80,
+        ingredients: [
+          { label: "たまご", icon: "images/たまご.webp" },
+          { label: "りんご", icon: "images/りんご.webp" },
+          { label: "カカオ", icon: "images/カカオ.webp" }
+        ]
+      },
+      {
+        name: "ハピナス",
+        sprite: "images/242.webp",
+        workTimeSec: 3100,
+        ingredientRate: 23.80,
+        ingredients: [
+          { label: "たまご", icon: "images/たまご.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "ミツ", icon: "images/ミツ.webp" }
+        ]
+      },
+      {
+        name: "バンギラス",
+        sprite: "images/248.webp",
+        workTimeSec: 2700,
+        ingredientRate: 26.60,
+        ingredients: [
+          { label: "ジンジャー", icon: "images/ジンジャー.webp" },
+          { label: "マメ", icon: "images/マメ.webp" },
+          { label: "ミート", icon: "images/ミート.webp" }
+        ]
+      },
+      {
+        name: "クチート",
+        sprite: "images/303.webp",
+        workTimeSec: 3200,
+        ingredientRate: 20.40,
+        ingredients: [
+          { label: "オイル", icon: "images/オイル.webp" },
+          { label: "コーン", icon: "images/コーン.webp" },
+          { label: "トマト", icon: "images/トマト.webp" }
+        ]
+      },
+      {
+        name: "ボスゴドラ",
+        sprite: "images/306.webp",
+        workTimeSec: 3000,
+        ingredientRate: 28.50,
+        ingredients: [
+          { label: "ミート", icon: "images/ミート.webp" },
+          { label: "コーヒー", icon: "images/コーヒー.webp" },
+          { label: "マメ", icon: "images/マメ.webp" }
+        ]
+      },
+      {
+        name: "フライゴン",
+        sprite: "images/330.webp",
+        workTimeSec: 2700,
+        ingredientRate: 17.20,
+        ingredients: [
+          { label: "アボカド", icon: "images/アボカド.webp" },
+          { label: "ハーブ", icon: "images/ハーブ.webp" },
+          { label: "マメ", icon: "images/マメ.webp" }
+        ]
+      },
+      {
+        name: "アブソル",
+        sprite: "images/359.webp",
+        workTimeSec: 2950,
+        ingredientRate: 17.80,
+        ingredients: [
+          { label: "カカオ", icon: "images/カカオ.webp" },
+          { label: "りんご", icon: "images/りんご.webp" },
+          { label: "きのこ", icon: "images/きのこ.webp" }
+        ]
+      },
+      {
+        name: "レントラー",
+        sprite: "images/405.webp",
+        workTimeSec: 2400,
+        ingredientRate: 20.00,
+        ingredients: [
+          { label: "トマト", icon: "images/トマト.webp" },
+          { label: "オイル", icon: "images/オイル.webp" },
+          { label: "コーヒー", icon: "images/コーヒー.webp" }
+        ]
+      },
+      {
+        name: "ドクロッグ",
+        sprite: "images/454.webp",
+        workTimeSec: 3400,
+        ingredientRate: 22.90,
+        ingredients: [
+          { label: "オイル", icon: "images/オイル.webp" },
+          { label: "ミート", icon: "images/ミート.webp" }
+        ]
+      },
+      {
+        name: "ユキノオー",
+        sprite: "images/460.webp",
+        workTimeSec: 3000,
+        ingredientRate: 25.00,
+        ingredients: [
+          { label: "トマト", icon: "images/トマト.webp" },
+          { label: "たまご", icon: "images/たまご.webp" },
+          { label: "きのこ", icon: "images/きのこ.webp" }
+        ]
+      },
+      {
+        name: "ダークライ",
+        sprite: "images/491.webp",
+        workTimeSec: 2900,
+        ingredientRate: 19.20,
+        ingredients: []
+      },
+      {
+        name: "パンプジン（中玉）",
+        sprite: "images/711.webp",
+        workTimeSec: 3200,
+        ingredientRate: 13.00,
+        ingredients: [
+          { label: "カボチャ", icon: "images/カボチャ.webp" },
+          { label: "マメ", icon: "images/マメ.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" }
+        ]
+      },
+      {
+        name: "クワガノン",
+        sprite: "images/738.webp",
+        workTimeSec: 2800,
+        ingredientRate: 19.40,
+        ingredients: [
+          { label: "コーヒー", icon: "images/コーヒー.webp" },
+          { label: "きのこ", icon: "images/きのこ.webp" },
+          { label: "ミツ", icon: "images/ミツ.webp" }
+        ]
+      },
+      {
+        name: "キテルグマ",
+        sprite: "images/760.webp",
+        workTimeSec: 2800,
+        ingredientRate: 22.90,
+        ingredients: [
+          { label: "コーン", icon: "images/コーン.webp" },
+          { label: "ミート", icon: "images/ミート.webp" },
+          { label: "たまご", icon: "images/たまご.webp" }
+        ]
+      },
+      {
+        name: "キュワワー",
+        sprite: "images/764.webp",
+        workTimeSec: 2500,
+        ingredientRate: 16.70,
+        ingredients: [
+          { label: "コーン", icon: "images/コーン.webp" },
+          { label: "ジンジャー", icon: "images/ジンジャー.webp" },
+          { label: "カカオ", icon: "images/カカオ.webp" }
+        ]
+      },
+      {
+        name: "ウッウ",
+        sprite: "images/845.webp",
+        workTimeSec: 2700,
+        ingredientRate: 16.50,
+        ingredients: [
+          { label: "オイル", icon: "images/オイル.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "たまご", icon: "images/たまご.webp" }
+        ]
+      },
+      {
+        name: "マスカーニャ",
+        sprite: "images/908.webp",
+        workTimeSec: 2600,
+        ingredientRate: 19.00,
+        ingredients: [
+          { label: "ポテト", icon: "images/ポテト.webp" },
+          { label: "ミルク", icon: "images/ミルク.webp" },
+          { label: "ジンジャー", icon: "images/ジンジャー.webp" }
+        ]
+      },
+      {
+        name: "ラウドボーン",
+        sprite: "images/911.webp",
+        workTimeSec: 2700,
+        ingredientRate: 26.80,
+        ingredients: [
+          { label: "りんご", icon: "images/りんご.webp" },
+          { label: "ミート", icon: "images/ミート.webp" },
+          { label: "ハーブ", icon: "images/ハーブ.webp" }
+        ]
+      },
+      {
+        name: "ウェーニバル",
+        sprite: "images/914.webp",
+        workTimeSec: 2600,
+        ingredientRate: 23.20,
+        ingredients: [
+          { label: "マメ", icon: "images/マメ.webp" },
+          { label: "ネギ", icon: "images/ねぎ.webp" },
+          { label: "オイル", icon: "images/オイル.webp" }
+        ]
+      },
+      {
+        name: "ドオー",
+        sprite: "images/980.webp",
+        workTimeSec: 3500,
+        ingredientRate: 20.80,
+        ingredients: [
+          { label: "カカオ", icon: "images/カカオ.webp" },
+          { label: "コーヒー", icon: "images/コーヒー.webp" },
+          { label: "ポテト", icon: "images/ポテト.webp" }
+        ]
+      }
+    ];
+
+    // ▼ 散布図トレース
+    const trace = {
+      x: pokemonData.map(p => p.workTimeSec),
+      y: pokemonData.map(p => p.ingredientRate),
+      // textをカスタムデータとして使用
+      text: pokemonData.map(p => p.name),
+      customdata: pokemonData.map((_, index) => index),
+      mode: "markers+text",
+      textposition: "top center",
+      type: "scatter",
+      marker: { size: 10 },
+      hovertemplate:
+        "<b>%{text}</b><br>" +
+        "お手伝い時間: %{x} 秒<br>" +
+        "食材確率: %{y}%<extra></extra>"
+    };
+
+    const layout = {
+      margin: { t: 40, r: 16, b: 40, l: 48 },
+      xaxis: { title: "お手伝い時間（秒）" },
+      yaxis: { title: "食材確率（％）" }
+    };
+
+    const config = {
+      responsive: true,
+      displaylogo: false
+    };
+
+    Plotly.newPlot("chart", [trace], layout, config).then(() => {
+      const card = document.getElementById("pokemon-card");
+      const chartEl = document.getElementById("chart");
+
+      // 初期表示：1匹目
+      renderPokemonCard(pokemonData[0]);
+
+      // クリックした点の index から、そのポケモンを取り出してカード表示
+      chartEl.on("plotly_click", (event) => {
+        const pt = event.points[0];
+
+        // 修正済: クリックされた点のラベル (text) を使って
+        const pokemonName = pt.text.trim();
+        const pokemon = pokemonData.find(p => p.name === pokemonName);
+
+        if (pokemon) {
+          renderPokemonCard(pokemon);
+        } else {
+          console.error("ポケモンデータが見つかりませんでした:", pokemonName);
+        }
+      });
+
+
+      function renderPokemonCard(p) {
+        let ingredientsIcons = "";
+        
+        // 修正: テンプレートリテラルでHTMLを構築
+        if (p.ingredients.length > 0) {
+          ingredientsIcons = `
+            <p style="margin:4px 0;">
+              ${p.ingredients.map(i => 
+                // 修正: map内のHTMLもテンプレートリテラルで記述
+                `<img src="${i.icon}" alt="${i.label}" class="ingredient-icon">`
+              ).join("")}
+            </p>
+          `;
+        } else {
+          ingredientsIcons =
+            '<p style="margin:4px 0;">食材：任意で変更可能</p>';
+        }
+
+        // 修正: テンプレートリテラルでHTMLを構築
+        card.innerHTML = `
+          <div class="card-inner">
+            <img src="${p.sprite}" alt="${p.name}" class="pokemon-sprite">
+            <div>
+              <h2 style="margin:0 0 8px 0;">${p.name}</h2>
+              ${ingredientsIcons}
+              <p style="margin:4px 0;">お手伝い時間：${p.workTimeSec} 秒</p>
+              <p style="margin:4px 0;">食材確率：${p.ingredientRate}%</p>
+            </div>
+          </div>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
