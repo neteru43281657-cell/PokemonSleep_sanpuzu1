@@ -1,5 +1,6 @@
-// --- 1. ポケモンデータの定義 (変更なし) ---
-// (中略 - ポケモンデータ定義)
+// ==============================
+// 1. ポケモンデータの定義
+// ==============================
 
 // --- A. 食材タイプポケモンデータ (Y軸: 食材確率) ---
 const pokemonDataIngredient = [
@@ -83,12 +84,13 @@ const pokemonDataSkill = [
     { name: "ミミッキュ", file: "778.webp", skill: "ばけのかわ(きのみバースト)", assistTime: 2500, skillRate: 3.50, ingredientsText: "りんご コーヒー きのこ" },
     { name: "ストリンダー（ハイ/ロー）", file: "849.webp", skill: "プラス(食材ゲットS)/マイナス(料理パワーアップS)", assistTime: 3100, skillRate: 6.40, ingredientsText: "ミルク りんご ねぎ" },
     { name: "パーモット", file: "923.webp", skill: "げんきオールS", assistTime: 2400, skillRate: 3.90, ingredientsText: "カカオ ミルク たまご" },
-    { name: "イーブイ（ハロウィン）", file: "ハロウィンイーブイ.webp", skill: "食材ゲットS", assistTime: 3200, ingredientRate: 4.60, ingredientsText: "カボチャ カカオ ミルク" },
+    { name: "イーブイ（ハロウィン）", file: "ハロウィンイーブイ.webp", skill: "食材ゲットS", assistTime: 3200, skillRate: 4.60, ingredientsText: "カボチャ カカオ ミルク" },
     { name: "ピカチュウ（ホリデー）", file: "ホリデーピカチュウ.webp", skill: "ゆめのかけらゲットS(固定)", assistTime: 2500, skillRate: 4.20, ingredientsText: "りんご ジンジャー たまご" },
 ];
 
-
-// データをPlotlyの形式に変換
+// ==============================
+// 2. Plotly 用のデータに変換
+// ==============================
 const x_data_ingredient = pokemonDataIngredient.map(p => p.assistTime);
 const y_data_ingredient = pokemonDataIngredient.map(p => p.ingredientRate);
 const pokemon_names_ingredient = pokemonDataIngredient.map(p => p.name);
@@ -97,21 +99,22 @@ const x_data_skill = pokemonDataSkill.map(p => p.assistTime);
 const y_data_skill = pokemonDataSkill.map(p => p.skillRate);
 const pokemon_names_skill = pokemonDataSkill.map(p => p.name);
 
-// 全てのデータを統合したマップ（ホバー用）
+// 全てのデータを統合したマップ（ホバー/クリック用）
 const allPokemonData = {
     ingredient: pokemonDataIngredient,
     skill: pokemonDataSkill
 };
 
+// ==============================
+// 3. グラフ設定
+// ==============================
 
-// --- 2. グラフ設定の定義 ---
-
-// 食材タイプの色 (見やすいオレンジ)
+// 食材タイプの色 (オレンジ)
 const COLOR_INGREDIENT = 'rgb(255, 165, 0)'; 
-// スキルタイプの色 (見やすい青)
+// スキルタイプの色 (青)
 const COLOR_SKILL = 'rgb(0, 150, 255)';
 
-// 共通のトレース設定
+// 共通トレース
 const commonTrace = {
   mode: 'markers+text',
   type: 'scatter',
@@ -133,36 +136,36 @@ const commonTrace = {
   hoverinfo: 'none',
 };
 
-// 食材タイプグラフのトレース
+// 食材タイプ
 const traceIngredient = {
     ...commonTrace,
     x: x_data_ingredient,
     y: y_data_ingredient,
     text: pokemon_names_ingredient,
-    marker: {...commonTrace.marker, color: COLOR_INGREDIENT} 
+    marker: { ...commonTrace.marker, color: COLOR_INGREDIENT }
 };
 
-// スキルタイプグラフのトレース
+// スキルタイプ
 const traceSkill = {
     ...commonTrace,
     x: x_data_skill,
     y: y_data_skill,
     text: pokemon_names_skill,
-    marker: {...commonTrace.marker, color: COLOR_SKILL} 
+    marker: { ...commonTrace.marker, color: COLOR_SKILL }
 };
 
-
-// 共通レイアウト設定
+// 共通レイアウト
 const commonLayout = {
     plot_bgcolor: '#FFFFFF',
     paper_bgcolor: '#FFFFFF',
-    hovermode: 'closest', 
+    hovermode: 'closest',
     responsive: true
 };
 
-// 食材タイプグラフのレイアウト
+// 食材タイプレイアウト
 const layoutIngredient = {
     ...commonLayout,
+    dragmode: 'pan',          // ← 1本指ドラッグはパン固定
     title: {
         text: '散布図_食材タイプ',
         font: { size: 26, color: COLOR_INGREDIENT } 
@@ -170,7 +173,7 @@ const layoutIngredient = {
     xaxis: {
         title: { text: 'おてつだい時間 (秒)', font: { size: 18 } },
         range: [2000, Math.max(...x_data_ingredient) * 1.05],
-        rangemode: 'tozero', 
+        rangemode: 'tozero',
         tickfont: { size: 14 },
         gridcolor: '#e5e5e5',
         zerolinecolor: '#cccccc',
@@ -186,9 +189,10 @@ const layoutIngredient = {
     },
 };
 
-// スキルタイプグラフのレイアウト
+// スキルタイプレイアウト
 const layoutSkill = {
     ...commonLayout,
+    dragmode: 'pan',          // ← 1本指ドラッグはパン固定
     title: {
         text: '散布図_スキルタイプ',
         font: { size: 26, color: COLOR_SKILL }
@@ -196,7 +200,7 @@ const layoutSkill = {
     xaxis: {
         title: { text: 'おてつだい時間 (秒)', font: { size: 18 } },
         range: [2000, Math.max(...x_data_skill) * 1.05],
-        rangemode: 'tozero', 
+        rangemode: 'tozero',
         tickfont: { size: 14 },
         gridcolor: '#e5e5e5',
         zerolinecolor: '#cccccc',
@@ -212,99 +216,86 @@ const layoutSkill = {
     },
 };
 
+// Plotly コンフィグ
 const config = {
-    displayModeBar: true, 
-    // Plotlyの内部ズーム(マウスホイール/トラックパッド)を無効化
-    scrollZoom: false,
+    displayModeBar: true,
+    scrollZoom: false,       // ホイールズーム無効（PC）
     displaylogo: false,
-    // ★最重要修正 1★: Plotlyのズーム関連のボタンを全て無効化し、ズームモードを起動させないようにする
-    modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ★最重要修正 2★: 1本指スライドをグラフの「移動(パン)」に固定
-    dragmode: 'pan', 
-    // ★最重要修正 3★: Plotlyのタッチ操作を 'pan' に設定し、Plotlyの矩形ズーム（四角形）が発動するのを確実に防ぐ
-    touchmode: 'pan', 
-    // ダブルクリック動作(ズームリセット)を無効化 (カスタムのダブルタップに必要)
-    doubleClick: 'false', 
+    modeBarButtonsToRemove: [
+        'zoom2d', 'pan2d', 'select2d', 'lasso2d',
+        'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'
+    ],
+    // dragmode / touchmode は layout で設定
+    // doubleClick はデフォルトのまま（自前のダブルタップ判定を使う）
 };
 
+// ==============================
+// 4. グラフ描画とタブ切り替え
+// ==============================
 
-// --- 3. グラフ描画とタブ切り替えロジック ---
-
-// 共通のレイアウト定義（元の俯瞰図に戻すために使用）
+// 全体レイアウト保存用
 let initialLayout = {
     ingredient: null,
     skill: null
 };
 
-// グラフ描画関数
 function plotGraph(type) {
     const plotDivId = `scatter-plot-${type}`;
     const trace = type === 'ingredient' ? traceIngredient : traceSkill;
     const layout = type === 'ingredient' ? layoutIngredient : layoutSkill;
-    
     const plotDiv = document.getElementById(plotDivId);
 
     if (!plotDiv._plotly_data) {
         Plotly.newPlot(plotDiv, [trace], layout, config).then(() => {
-             // 最初の描画時に、元の全体レイアウトを保存しておく
+            // 初期レイアウト保存
             initialLayout[type] = JSON.parse(JSON.stringify(layout));
         });
-        
-        // 描画されたグラフにイベントを設定
-        plotDiv.on('plotly_hover', handlePlotlyHover); // PC用
-        plotDiv.on('plotly_unhover', hideDetailCard); // PC用
-        
-        // タップ/クリックでカード表示とズーム
-        plotDiv.on('plotly_click', handlePlotlyClick); 
-        
-        // ダブルタップでズームリセット
-        plotDiv.on('plotly_doubleclick', handlePlotlyDoubleClick);
-        
+
+        // イベント登録
+        plotDiv.on('plotly_hover', handlePlotlyHover);
+        plotDiv.on('plotly_unhover', hideDetailCard);
+        plotDiv.on('plotly_click', handlePlotlyClick);
+        // ダブルクリックイベントは使わず、自前のダブルタップ判定で handlePlotlyDoubleClick を呼ぶ
     } else {
         Plotly.relayout(plotDiv, layout);
     }
 }
 
-// グローバル関数として公開
-window.openTab = function(tabName) {
-    // グラフコンテナの表示/非表示を切り替え
-    document.getElementById('scatter-plot-ingredient').style.display = (tabName === 'ingredient') ? 'block' : 'none';
-    document.getElementById('scatter-plot-skill').style.display = (tabName === 'skill') ? 'block' : 'none';
+// タブ切り替え関数（グローバルに公開）
+window.openTab = function (tabName) {
+    document.getElementById('scatter-plot-ingredient').style.display =
+        (tabName === 'ingredient') ? 'block' : 'none';
+    document.getElementById('scatter-plot-skill').style.display =
+        (tabName === 'skill') ? 'block' : 'none';
 
-    // タブボタンのアクティブ状態を切り替え
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
     });
     document.querySelector(`.tab-button[onclick*='${tabName}']`).classList.add('active');
 
-    // グラフを描画
     plotGraph(tabName);
-    
-    // ホバーカードを非表示にする
     hideDetailCard();
-}
+};
 
-// 初期表示: 食材タイプグラフを表示
-window.onload = function() {
+// 初期表示
+window.onload = function () {
     window.openTab('ingredient');
 };
 
-
-// --- 4. カスタム詳細情報カードの実装 (共通ロジック) ---
+// ==============================
+// 5. 詳細情報カード & タッチ操作
+// ==============================
 
 const detailCard = document.getElementById('detail-card');
-let clickTimer = null; // ダブルクリック判定用
+let lastTapTime = 0;   // ダブルタップ判定用
 
-/**
- * 詳細情報カードのHTMLを生成する関数
- */
+// 詳細カード HTML 生成
 function createDetailCardHtml(p, type) {
-    const pokemonImagePath = `./images/${p.file}`; 
+    const pokemonImagePath = `./images/${p.file}`;
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
-    // カードの情報をさらにコンパクトに表示する
     const ingredientImagesHtml = ingredients.map(ing => {
-        const ingImagePath = `./images/${ing}.webp`; 
+        const ingImagePath = `./images/${ing}.webp`;
         return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
     }).join('');
 
@@ -320,107 +311,97 @@ function createDetailCardHtml(p, type) {
     `;
 }
 
-// PCでのホバーイベント（PCではホバーは維持）
+// PC 用ホバー
 function handlePlotlyHover(data) {
-    // 既にタップで表示されている場合は、ホバーイベントを無視する (二重表示防止)
+    // すでにタップ表示中なら無視（スマホとの競合防止）
     if (detailCard.style.display === 'block') return;
 
     if (data.points && data.points.length > 0) {
-        
-        const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
-        
+        const activeTab = document
+            .querySelector('.tab-button.active')
+            .textContent.includes('食材') ? 'ingredient' : 'skill';
+
         const pointIndex = data.points[0].pointIndex;
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
 
-        // PC表示ではカーソル位置に表示 (xPos, yPosを使用)
         const xPos = data.event.clientX;
         const yPos = data.event.clientY;
-        
+
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
-        
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
-        
-        detailCard.style.top = `${yPos + 15}px`; 
-        detailCard.style.left = `${xPos + 15}px`; 
-        detailCard.style.display = 'block';
 
+        detailCard.style.top = `${yPos + 15}px`;
+        detailCard.style.left = `${xPos + 15}px`;
+        detailCard.style.display = 'block';
     } else {
         hideDetailCard();
     }
 }
 
-
-// シングルタップ/クリック時の処理 (主にスマホ対応)
+// タップ / クリック時
 function handlePlotlyClick(data) {
-    // データポイント上でのクリックかどうかを確認
+    const now = Date.now();
+    const activeTab = document
+        .querySelector('.tab-button.active')
+        .textContent.includes('食材') ? 'ingredient' : 'skill';
+    const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
+
+    // --- ダブルタップ判定 ---
+    if (now - lastTapTime < 350) {   // 350ms 以内に2回タップ
+        lastTapTime = 0;
+        handlePlotlyDoubleClick();
+        return;
+    }
+    lastTapTime = now;
+
+    // --- シングルタップ処理 ---
     if (data.points && data.points.length > 0) {
-        
-        // ダブルクリック判定のためのタイマー設定 (シングルタップを300ms待つ)
-        if (clickTimer) {
-            clearTimeout(clickTimer);
-            clickTimer = null;
-            // 300ms以内に2回目のクリックが発生した場合は、ダブルクリックイベントに任せる
-            return;
-        }
-
         const pointIndex = data.points[0].pointIndex;
-        const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
-        const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
-        // 1. カード表示（位置を画面中央上部に統一）
+        // カード表示（画面上部中央）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
 
-        // カードの位置を画面の上から25%に再調整（グラフの上部中央付近）
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-        
-        detailCard.style.top = `25vh`; 
-        // カードの最大幅が100pxなので、その半分(50px)を引いて中央寄せ
-        detailCard.style.left = `${(viewportWidth / 2) - 50}px`; 
+        detailCard.style.top = `25vh`;
+        detailCard.style.left = `${(viewportWidth / 2) - 50}px`; // max-width 100px を想定
         detailCard.style.display = 'block';
 
-        // 2. ズーム操作（該当ポケモンを中心にする）
+        // 該当ポケモン付近へ軽くズームイン
         const newLayout = {
             'xaxis.range': [data.points[0].x - 500, data.points[0].x + 500],
-            'yaxis.range': [data.points[0].y * 0.9, data.points[0].y * 1.1] 
+            'yaxis.range': [data.points[0].y * 0.9, data.points[0].y * 1.1]
         };
         Plotly.relayout(plotDiv, newLayout);
-        
-        // 3. ダブルクリック判定用のタイマーを開始
-        clickTimer = setTimeout(() => {
-            clickTimer = null;
-        }, 300); // 300ms
-        
     } else {
-        // 点以外をタップした場合は、カードを非表示にする
+        // 点以外をタップしたらカードを消す
         hideDetailCard();
     }
 }
 
-// ダブルタップ時の処理（全体表示に戻す）
-function handlePlotlyDoubleClick(data) {
-    // カードを非表示
+// ダブルタップで全体表示に戻す
+function handlePlotlyDoubleClick() {
     hideDetailCard();
-    
-    const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
+
+    const activeTab = document
+        .querySelector('.tab-button.active')
+        .textContent.includes('食材') ? 'ingredient' : 'skill';
     const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
-    
-    // 最初に保存した全体レイアウトに戻す
+
     if (initialLayout[activeTab]) {
         Plotly.relayout(plotDiv, {
             'xaxis.range': initialLayout[activeTab].xaxis.range,
             'yaxis.range': initialLayout[activeTab].yaxis.range
         });
     } else {
-        // Plotlyの標準リセットを実行（保険）
-        Plotly.relayout(plotDiv, {'xaxis.autorange': true, 'yaxis.autorange': true});
+        Plotly.relayout(plotDiv, { 'xaxis.autorange': true, 'yaxis.autorange': true });
     }
 }
 
-
+// カード非表示
 function hideDetailCard() {
     detailCard.style.display = 'none';
     detailCard.style.borderColor = '#333';
