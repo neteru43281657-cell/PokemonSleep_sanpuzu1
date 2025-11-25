@@ -27,7 +27,7 @@ const pokemonData = [
     { name: "ユキノオー", file: "460.webp", assistTime: 3000, ingredientRate: 25.00, ingredientsText: "トマト たまご きのこ" },
     { name: "ダークライ", file: "491.webp", assistTime: 2900, ingredientRate: 19.20, ingredientsText: "" }, 
     { name: "パンプジン（中玉）", file: "711.webp", assistTime: 3200, ingredientRate: 13.00, ingredientsText: "カボチャ マメ ポテト" },
-    { name: "クワガノン", file: "738.webp", assistTime: 2800, ingredientTime: 19.40, ingredientsText: "コーヒー きのこ ミツ" },
+    { name: "クワガノン", file: "738.webp", assistTime: 2800, ingredientRate: 19.40, ingredientsText: "コーヒー きのこ ミツ" },
     { name: "キテルグマ", file: "760.webp", assistTime: 2800, ingredientRate: 22.90, ingredientsText: "コーン ミート たまご" },
     { name: "キュワワー", file: "764.webp", assistTime: 2500, ingredientRate: 16.70, ingredientsText: "コーン ジンジャー カカオ" },
     { name: "ウッウ", file: "845.webp", assistTime: 2700, ingredientRate: 16.50, ingredientsText: "オイル ポテト たまご" },
@@ -40,17 +40,27 @@ const pokemonData = [
 // データをPlotlyの形式に変換
 const x_data = pokemonData.map(p => p.assistTime);
 const y_data = pokemonData.map(p => p.ingredientRate);
-const text_data = pokemonData.map(p => `${p.name}<br>おてつだい時間: ${p.assistTime}秒<br>食材確率: ${p.ingredientRate}%`);
+// プロット上に表示するポケモン名
+const pokemon_names_for_label = pokemonData.map(p => p.name);
 
 
 // --- 2. グラフの設定と描画 ---
 const trace = {
   x: x_data,
   y: y_data,
-  mode: 'markers', 
+  // ★変更点1★: modeを 'markers+text' に変更して、マーカーとテキスト両方を表示
+  mode: 'markers+text', 
   type: 'scatter',
   name: 'ポケモン散布図',
-  text: text_data,
+  // ★変更点2★: プロットの横に表示するテキストとしてポケモン名を設定
+  text: pokemon_names_for_label,
+  // ★変更点3★: テキストの表示位置とフォントサイズを設定
+  textposition: 'top center', // プロットの上に中央寄せで表示
+  textfont: {
+    family: 'Arial, sans-serif',
+    size: 10, // 小さめのフォントサイズ
+    color: '#333'
+  },
   marker: {
     size: 15,
     opacity: 0.8,
@@ -70,9 +80,7 @@ const layout = {
     rangemode: 'tozero',
     tickformat: '.1f'
   },
-  // ★重要★: ホバーモードを「最も近い点」に設定。
-  // これにより、空白領域での誤認識を防ぎます。
-  hovermode: 'closest', 
+  hovermode: false, 
   responsive: true
 };
 
@@ -96,7 +104,6 @@ function createDetailCardHtml(p) {
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
     const ingredientImagesHtml = ingredients.map(ing => {
-        // 画像ファイル名が「食材名.webp」であると想定
         const ingImagePath = `./images/${ing}.webp`; 
         return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
     }).join('');
@@ -111,10 +118,10 @@ function createDetailCardHtml(p) {
     `;
 }
 
-// グラフ上の点にカーソルが合わさった時、またはクリックされた時のイベント
+// グラフ上の点にカーソルが合わさった時のイベント
 plotDiv.on('plotly_hover', function(data) {
-    // data.pointsが存在し、インデックスが有効な場合にのみ処理を実行
-    if (data.points && data.points.length > 0) {
+    if (data.points && data.points.length > 0 && data.points[0].curveNumber === 0) {
+        
         const pointIndex = data.points[0].pointIndex;
         const hoveredPokemon = pokemonData[pointIndex];
         
@@ -123,10 +130,12 @@ plotDiv.on('plotly_hover', function(data) {
 
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon);
         
-        // カードの位置を設定し表示（カーソルの少し右下に表示）
         detailCard.style.top = `${yPos + 15}px`; 
         detailCard.style.left = `${xPos + 15}px`; 
         detailCard.style.display = 'block';
+
+    } else {
+        hideDetailCard();
     }
 });
 
@@ -134,8 +143,6 @@ function hideDetailCard() {
     detailCard.style.display = 'none';
 }
 
-// カーソルが離れたらカードを非表示にする
 plotDiv.on('plotly_unhover', hideDetailCard);
-
-// クリック時も非表示にする（ホバーイベントで表示を制御するため）
 plotDiv.on('plotly_click', hideDetailCard);
+```http://googleusercontent.com/image_generation_content/0
