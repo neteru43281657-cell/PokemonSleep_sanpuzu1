@@ -219,7 +219,7 @@ const config = {
     displaylogo: false,
     // 不要なボタンを非表示
     modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ★重要修正 1★: 1本指スライドをグラフの「移動(パン)」に固定する
+    // ★重要修正 1★: 1本指スライドをグラフの「移動(パン)」に固定
     dragmode: 'pan', 
     // ★重要修正 2★: タッチ操作を 'pan' に設定し、Plotlyのズーム機能を起動させないようにする
     touchmode: 'pan', 
@@ -302,23 +302,21 @@ function createDetailCardHtml(p, type) {
     const pokemonImagePath = `./images/${p.file}`; 
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
+    // ★重要修正 3★: カードの情報をよりコンパクトに表示する
     const ingredientImagesHtml = ingredients.map(ing => {
         const ingImagePath = `./images/${ing}.webp`; 
         return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
     }).join('');
 
-    // 表示するY軸のデータとラベルを決定
     const yValue = type === 'ingredient' ? `${p.ingredientRate}%` : `${p.skillRate}%`;
     const yLabel = type === 'ingredient' ? '食材確率' : 'スキル確率';
 
     return `
-        <h3>${p.name}</h3>
-        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}">
-        <p><strong>スキル:</strong> ${p.skill}</p>
-        <p><strong>おてつだい時間:</strong> ${p.assistTime} 秒</p>
-        <p><strong>${yLabel}:</strong> ${yValue}</p>
-        <p><strong>持ってくる食材:</strong></p>
-        <div class="ingredient-images">${ingredientImagesHtml || 'なし'}</div>
+        <h3 style="font-size: 12px; margin-bottom: 5px;">${p.name}</h3>
+        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}" style="width: 40px; height: 40px; margin-bottom: 5px;">
+        <p style="font-size: 10px; margin: 2px 0;"><strong>${yLabel}:</strong> ${yValue}</p>
+        <p style="font-size: 10px; margin: 2px 0;"><strong>時間:</strong> ${p.assistTime}s</p>
+        <div class="ingredient-images" style="gap: 2px;">${ingredientImagesHtml || 'なし'}</div>
     `;
 }
 
@@ -343,9 +341,8 @@ function handlePlotlyHover(data) {
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
         
-        const cardTitle = detailCard.querySelector('h3');
-        if(cardTitle) { cardTitle.style.color = cardColor; }
-
+        // カード内の文字色設定を削除 (CSSで統一するため)
+        
         detailCard.style.top = `${yPos + 15}px`; 
         detailCard.style.left = `${xPos + 15}px`; 
         detailCard.style.display = 'block';
@@ -374,23 +371,20 @@ function handlePlotlyClick(data) {
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
         const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
-        // 1. カード表示（位置を見切れにくい画面上部に統一）
+        // 1. カード表示（位置を画面中央上部に統一）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
-        const cardTitle = detailCard.querySelector('h3');
-        if(cardTitle) { cardTitle.style.color = cardColor; }
 
-        // ★重要修正 3★: カードの位置を画面の上から20%の位置に固定する (見切れ防止のため)
+        // ★重要修正 4★: カードの位置を画面の上から25%に再調整（グラフの上部中央付近）
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         
-        detailCard.style.top = `20vh`; 
-        // カードの最大幅が200pxなので、その半分(100px)を引いて中央寄せ
-        detailCard.style.left = `${(viewportWidth / 2) - 100}px`; 
+        detailCard.style.top = `25vh`; 
+        // カードの最大幅が100pxになったので、その半分(50px)を引いて中央寄せ
+        detailCard.style.left = `${(viewportWidth / 2) - 50}px`; 
         detailCard.style.display = 'block';
 
         // 2. ズーム操作（該当ポケモンを中心にする）
-        // x軸は前後500秒、y軸は前後10%程度にズーム
         const newLayout = {
             'xaxis.range': [data.points[0].x - 500, data.points[0].x + 500],
             'yaxis.range': [data.points[0].y * 0.9, data.points[0].y * 1.1] 
@@ -423,7 +417,7 @@ function handlePlotlyDoubleClick(data) {
             'yaxis.range': initialLayout[activeTab].yaxis.range
         });
     } else {
-        // もしinitialLayoutが保存されていなければ、Plotlyの標準リセットを実行（保険）
+        // Plotlyの標準リセットを実行（保険）
         Plotly.relayout(plotDiv, {'xaxis.autorange': true, 'yaxis.autorange': true});
     }
 }
