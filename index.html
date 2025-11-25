@@ -9,19 +9,17 @@
     
     <style>
         /* グラフのレスポンシブ対応とスタイリング */
-        /* グラフコンテナの親要素 */
         #plot-container {
             width: 95vw;
-            /* ★重要修正 4★: グラフの高さを下げ、横長に見えるように調整 (85vh -> 65vh) */
             height: 65vh; 
             margin: 20px auto 0 auto;
         }
-        /* グラフの縦横比をスマホで見やすく調整 */
         .scatter-plot {
             width: 100%;
             height: 100%;
-            /* 1本指スライド（パン）を可能にするため、ブラウザネイティブのズームを制御 */
-            touch-action: pan-y; 
+            /* ★最重要修正 5★: グラフ内での全てのブラウザ操作（ズーム、パン）を無効化し、Plotlyの動作に完全に依存させる */
+            /* これにより、Plotlyのdragmode: 'pan'設定が優先され、意図しないズームを防ぐ */
+            touch-action: none; 
         }
 
         /* --- タブスタイリング (変更なし) --- */
@@ -49,7 +47,6 @@
         .tab-button:hover {
             background-color: #ddd;
         }
-        /* アクティブなタブ */
         .tab-button.active {
             background-color: #fff;
             border-color: #333;
@@ -63,39 +60,42 @@
             background-color: #ffffff;
             border: 2px solid #333;
             border-radius: 8px;
-            padding: 15px;
+            padding: 8px; /* パディングを縮小 */
             box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
             z-index: 100;
             display: none;
-            max-width: 200px; 
+            /* ★重要修正 6★: カードの最大幅を大幅に縮小 (100px = 約30%のサイズ) */
+            max-width: 100px; 
             font-family: sans-serif;
+            text-align: center; /* コンテンツを中央寄せ */
+            line-height: 1.2; /* 行間を詰める */
         }
         #detail-card h3 {
             margin-top: 0;
             color: #2a6496;
             border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            padding-bottom: 3px;
+            margin-bottom: 5px;
         }
         #pokemon-image {
             display: block;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 10px auto;
+            width: 40px; /* 画像サイズを縮小 */
+            height: 40px;
+            margin: 0 auto 5px auto;
             border: 1px solid #eee;
             border-radius: 50%;
             object-fit: contain;
         }
         .ingredient-images {
             display: flex;
-            gap: 5px;
+            gap: 2px; /* ギャップを縮小 */
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 5px;
         }
         .ingredient-images img {
-            width: 30px;
-            height: 30px;
+            width: 20px; /* 食材アイコンを縮小 */
+            height: 20px;
             border-radius: 4px;
             object-fit: contain;
             background-color: #f7f7f7;
