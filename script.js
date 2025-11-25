@@ -1,4 +1,4 @@
-// --- 1. ポケモンデータの定義 ---
+// --- 1. ポケモンデータの定義 (変更なし) ---
 
 // --- A. 食材タイプポケモンデータ (Y軸: 食材確率) ---
 const pokemonDataIngredient = [
@@ -82,7 +82,7 @@ const pokemonDataSkill = [
     { name: "ミミッキュ", file: "778.webp", skill: "ばけのかわ(きのみバースト)", assistTime: 2500, skillRate: 3.50, ingredientsText: "りんご コーヒー きのこ" },
     { name: "ストリンダー（ハイ/ロー）", file: "849.webp", skill: "プラス(食材ゲットS)/マイナス(料理パワーアップS)", assistTime: 3100, skillRate: 6.40, ingredientsText: "ミルク りんご ねぎ" },
     { name: "パーモット", file: "923.webp", skill: "げんきオールS", assistTime: 2400, skillRate: 3.90, ingredientsText: "カカオ ミルク たまご" },
-    { name: "イーブイ（ハロウィン）", file: "ハロウィンイーブイ.webp", skill: "食材ゲットS", assistTime: 3200, skillRate: 4.60, ingredientsText: "カボチャ カカオ ミルク" },
+    { name: "イーブイ（ハロウィン）", file: "ハロウィンイーブイ.webp", skill: "食材ゲットS", assistTime: 3200, ingredientRate: 4.60, ingredientsText: "カボチャ カカオ ミルク" },
     { name: "ピカチュウ（ホリデー）", file: "ホリデーピカチュウ.webp", skill: "ゆめのかけらゲットS(固定)", assistTime: 2500, skillRate: 4.20, ingredientsText: "りんご ジンジャー たまご" },
 ];
 
@@ -213,12 +213,16 @@ const layoutSkill = {
 
 const config = {
     displayModeBar: true, 
-    // ★修正ポイント★: ピンチイン/ピンチアウト操作に対応
     scrollZoom: true,
     displaylogo: false,
+    // 不要なボタンを非表示
     modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ズームモードをピンチ操作に設定
+    // ★修正ポイント★: タッチモードを pinch に設定し、2本指ズームを有効化
     touchmode: 'pinch', 
+    // ★修正ポイント★: Plotlyのデフォルトのダブルクリック動作(ズームリセット)を無効化
+    // これにより、カスタムのダブルクリックイベント (handlePlotlyDoubleClick) が正常に機能し、
+    // かつ pinch/2本指ズームが干渉なく動作します。
+    doubleClick: 'false', 
 };
 
 
@@ -248,10 +252,10 @@ function plotGraph(type) {
         plotDiv.on('plotly_hover', handlePlotlyHover); // PC用
         plotDiv.on('plotly_unhover', hideDetailCard); // PC用
         
-        // ★修正ポイント★: タップ/クリックでカード表示とズーム
+        // タップ/クリックでカード表示とズーム
         plotDiv.on('plotly_click', handlePlotlyClick); 
         
-        // ★修正ポイント★: ダブルタップでズームリセット
+        // ダブルタップでズームリセット
         plotDiv.on('plotly_doubleclick', handlePlotlyDoubleClick);
         
     } else {
@@ -328,6 +332,7 @@ function handlePlotlyHover(data) {
         const pointIndex = data.points[0].pointIndex;
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
 
+        // PC表示ではカーソル位置に表示 (xPos, yPosを使用)
         const xPos = data.event.clientX;
         const yPos = data.event.clientY;
         
@@ -349,12 +354,12 @@ function handlePlotlyHover(data) {
 }
 
 
-// ★修正ポイント★: シングルタップ/クリック時の処理
+// シングルタップ/クリック時の処理 (主にスマホ対応)
 function handlePlotlyClick(data) {
     // データポイント上でのクリックかどうかを確認
     if (data.points && data.points.length > 0) {
         
-        // ダブルクリック判定のためのタイマー設定
+        // ダブルクリック判定のためのタイマー設定 (シングルタップを300ms待つ)
         if (clickTimer) {
             clearTimeout(clickTimer);
             clickTimer = null;
@@ -367,19 +372,19 @@ function handlePlotlyClick(data) {
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
         const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
-        // 1. カード表示（位置はポイントの上に固定）
-        const xPos = data.event.clientX;
-        const yPos = data.event.clientY;
-        
+        // 1. カード表示（位置を画面中央上部に統一）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
         const cardTitle = detailCard.querySelector('h3');
         if(cardTitle) { cardTitle.style.color = cardColor; }
 
-        // ポケモンがタップされた場所にカードを配置
-        detailCard.style.top = `${yPos + 15}px`; 
-        detailCard.style.left = `${xPos + 15}px`; 
+        // ★修正ポイント★: カードの位置を画面に対して固定する
+        // 画面の幅の50%の位置に中央揃え
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        
+        detailCard.style.top = `10vh`; // 画面の上から10%の位置
+        detailCard.style.left = `${(viewportWidth / 2) - 100}px`; // カードの幅を200pxと仮定して中央寄せ
         detailCard.style.display = 'block';
 
         // 2. ズーム操作（該当ポケモンを中心にする）
@@ -393,7 +398,7 @@ function handlePlotlyClick(data) {
         // 3. ダブルクリック判定用のタイマーを開始
         clickTimer = setTimeout(() => {
             clickTimer = null;
-        }, 300); // 300ms以内に2回目のクリックがなければシングルクリックとみなす
+        }, 300); // 300ms
         
     } else {
         // 点以外をタップした場合は、カードを非表示にする
@@ -401,10 +406,9 @@ function handlePlotlyClick(data) {
     }
 }
 
-// ★修正ポイント★: ダブルタップ時の処理（全体表示に戻す）
+// ダブルタップ時の処理（全体表示に戻す）
 function handlePlotlyDoubleClick(data) {
-    // デフォルトのダブルクリック動作（ズームリセット）を防止
-    Plotly.d3.event.preventDefault(); 
+    // Plotlyのデフォルトダブルクリック動作はconfigで無効化済み
     
     // カードを非表示
     hideDetailCard();
