@@ -60,13 +60,31 @@ const trace = {
   marker: {
     size: 15,
     opacity: 0.8,
-    color: 'rgb(50, 100, 200)'
+    color: 'rgb(50, 100, 200)',
+    // ★おしゃれポイント1★: マーカーに白い枠線を追加し、視認性を向上
+    line: {
+      color: 'rgba(255, 255, 255, 1)',
+      width: 1
+    }
   },
   hoverinfo: 'none',
 };
 
 const layout = {
-  title: '散布図_食材ポケモン',
+  // ★強調ポイント1★: タイトルフォントを大きく、太字のように見える 'bold' に設定
+  title: {
+      text: '散布図_食材ポケモン',
+      font: {
+          size: 26, // サイズを大きく
+          color: '#2a6496' // タイトル色を強調
+      }
+  },
+  
+  // ★おしゃれポイント2★: グラフの背景色を白にする
+  plot_bgcolor: '#FFFFFF',
+  // ★おしゃれポイント3★: グラフの余白部分の背景色も白にする
+  paper_bgcolor: '#FFFFFF',
+
   xaxis: {
     title: {
         text: 'おてつだい時間 (秒)',
@@ -74,12 +92,14 @@ const layout = {
             size: 18 
         }
     },
-    // ★修正点★: おてつだい時間（X軸）の表示範囲を 2000秒 からデータの最大値+α に設定
-    range: [2000, Math.max(...x_data) * 1.05], 
+    range: [2000, Math.max(...x_data) * 1.05],
     rangemode: 'tozero', 
     tickfont: {
         size: 14 
     },
+    // ★おしゃれポイント4★: グリッドラインを薄いグレーに
+    gridcolor: '#e5e5e5',
+    zerolinecolor: '#cccccc', // ゼロラインを強調
   },
   yaxis: {
     title: {
@@ -88,13 +108,15 @@ const layout = {
             size: 18
         }
     },
-    // ★修正点★: 食材確率（Y軸）の表示範囲を 10% からデータの最大値+α に設定
     range: [10, Math.max(...y_data) * 1.05],
     rangemode: 'tozero',
     tickfont: {
         size: 14
     },
     tickformat: '.1f',
+    // ★おしゃれポイント5★: グリッドラインを薄いグレーに
+    gridcolor: '#e5e5e5',
+    zerolinecolor: '#cccccc', // ゼロラインを強調
   },
   hovermode: 'closest', 
   responsive: true
@@ -108,7 +130,7 @@ Plotly.newPlot(plotDiv, [trace], layout, {
 });
 
 
-// --- 3. カスタム詳細情報カードの実装 (前回正常動作していたロジック) ---
+// --- 3. カスタム詳細情報カードの実装 (変更なし) ---
 
 const detailCard = document.getElementById('detail-card');
 
