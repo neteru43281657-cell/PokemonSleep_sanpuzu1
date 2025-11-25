@@ -1,4 +1,5 @@
 // --- 1. ポケモンデータの定義 (変更なし) ---
+// (中略 - ポケモンデータ定義)
 
 // --- A. 食材タイプポケモンデータ (Y軸: 食材確率) ---
 const pokemonDataIngredient = [
@@ -213,14 +214,16 @@ const layoutSkill = {
 
 const config = {
     displayModeBar: true, 
-    // ★重要修正★: Plotlyの内部ズームを完全に無効化し、モバイルのネイティブピンチズームに任せる
-    scrollZoom: false, // マウスホイール/トラックパッドによるズームを無効化
+    // Plotlyの内部ズーム(マウスホイール/トラックパッド)を無効化
+    scrollZoom: false,
     displaylogo: false,
+    // 不要なボタンを非表示
     modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ★重要修正★: タッチモードを 'pan' に変更。これにより、Plotlyの矩形ズーム（四角形）が発動するのを防ぎ、
-    // グラフのパン操作（移動）に特化させ、ピンチ操作はブラウザのネイティブズームに委ねる。
+    // ★重要修正 1★: 1本指スライドをグラフの「移動(パン)」に固定する
+    dragmode: 'pan', 
+    // ★重要修正 2★: タッチ操作を 'pan' に設定し、Plotlyのズーム機能を起動させないようにする
     touchmode: 'pan', 
-    // Plotlyのデフォルトのダブルクリック動作(ズームリセット)を無効化 (カスタムのダブルタップに必要)
+    // ダブルクリック動作(ズームリセット)を無効化 (カスタムのダブルタップに必要)
     doubleClick: 'false', 
 };
 
@@ -371,19 +374,17 @@ function handlePlotlyClick(data) {
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
         const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
-        // 1. カード表示（位置をグラフエリアの中央下部に統一）
+        // 1. カード表示（位置を見切れにくい画面上部に統一）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
         const cardTitle = detailCard.querySelector('h3');
         if(cardTitle) { cardTitle.style.color = cardColor; }
 
-        // ★重要修正★: カードの位置をグラフエリアの底部（上から約 80%）に固定する
-        // 画面の幅の50%の位置に中央揃え
+        // ★重要修正 3★: カードの位置を画面の上から20%の位置に固定する (見切れ防止のため)
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         
-        // グラフエリアは縦85vhなので、その中の底部(約80%)に固定
-        detailCard.style.top = `80vh`; 
+        detailCard.style.top = `20vh`; 
         // カードの最大幅が200pxなので、その半分(100px)を引いて中央寄せ
         detailCard.style.left = `${(viewportWidth / 2) - 100}px`; 
         detailCard.style.display = 'block';
