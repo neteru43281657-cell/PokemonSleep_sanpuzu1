@@ -12,8 +12,8 @@
         /* グラフコンテナの親要素 */
         #plot-container {
             width: 95vw;
-            height: 90vh;
-            margin: 20px auto;
+            height: 85vh; /* 出典のスペースを確保するため高さを少し減らす */
+            margin: 20px auto 0 auto;
         }
 
         /* 個別グラフのサイズ調整 */
@@ -101,22 +101,39 @@
             object-fit: contain;
             background-color: #f7f7f7;
         }
+        
+        /* --- 出典スタイリング --- */
+        #source-info {
+            width: 95vw;
+            margin: 10px auto 20px auto;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        #source-info strong {
+            font-weight: bold;
+            color: #555;
+        }
     </style>
 </head>
 <body>
 
     <div class="tab-button-container">
-        <button class="tab-button active" onclick="openTab('ingredient')">食材タイプグラフ</button>
-        <button class="tab-button" onclick="openTab('skill')">スキルタイプグラフ</button>
+        <button class="tab-button active" onclick="openTab('ingredient')">食材タイプ</button>
+        <button class="tab-button" onclick="openTab('skill')">スキルタイプ</button>
     </div>
 
     <div id="plot-container">
         <div id="scatter-plot-ingredient" class="scatter-plot tab-content"></div>
-        
         <div id="scatter-plot-skill" class="scatter-plot tab-content" style="display: none;"></div>
     </div>
 
     <div id="detail-card"></div>
+
+    <div id="source-info">
+        <strong>出典</strong><br>
+        RaenonXポケスリ攻略ツール / ポケモンスリープ攻略・検証 Wiki*
+    </div>
     
     <script src="script.js"></script>
 
