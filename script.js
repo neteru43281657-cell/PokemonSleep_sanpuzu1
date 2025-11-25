@@ -217,11 +217,11 @@ const config = {
     // Plotlyの内部ズーム(マウスホイール/トラックパッド)を無効化
     scrollZoom: false,
     displaylogo: false,
-    // 不要なボタンを非表示
+    // ★最重要修正 1★: Plotlyのズーム関連のボタンを全て無効化し、ズームモードを起動させないようにする
     modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
-    // ★重要修正 1★: 1本指スライドをグラフの「移動(パン)」に固定
+    // ★最重要修正 2★: 1本指スライドをグラフの「移動(パン)」に固定
     dragmode: 'pan', 
-    // ★重要修正 2★: タッチ操作を 'pan' に設定し、Plotlyのズーム機能を起動させないようにする
+    // ★最重要修正 3★: Plotlyのタッチ操作を 'pan' に設定し、Plotlyの矩形ズーム（四角形）が発動するのを確実に防ぐ
     touchmode: 'pan', 
     // ダブルクリック動作(ズームリセット)を無効化 (カスタムのダブルタップに必要)
     doubleClick: 'false', 
@@ -302,7 +302,7 @@ function createDetailCardHtml(p, type) {
     const pokemonImagePath = `./images/${p.file}`; 
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
-    // ★重要修正 3★: カードの情報をよりコンパクトに表示する
+    // カードの情報をさらにコンパクトに表示する
     const ingredientImagesHtml = ingredients.map(ing => {
         const ingImagePath = `./images/${ing}.webp`; 
         return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
@@ -312,11 +312,11 @@ function createDetailCardHtml(p, type) {
     const yLabel = type === 'ingredient' ? '食材確率' : 'スキル確率';
 
     return `
-        <h3 style="font-size: 12px; margin-bottom: 5px;">${p.name}</h3>
-        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}" style="width: 40px; height: 40px; margin-bottom: 5px;">
-        <p style="font-size: 10px; margin: 2px 0;"><strong>${yLabel}:</strong> ${yValue}</p>
-        <p style="font-size: 10px; margin: 2px 0;"><strong>時間:</strong> ${p.assistTime}s</p>
-        <div class="ingredient-images" style="gap: 2px;">${ingredientImagesHtml || 'なし'}</div>
+        <h3 style="font-size: 11px; margin-bottom: 3px; padding-bottom: 2px; border-bottom: 1px solid #ccc;">${p.name}</h3>
+        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}" style="width: 35px; height: 35px; margin-bottom: 3px; border-radius: 50%;">
+        <p style="font-size: 9px; margin: 1px 0; line-height: 1;"><strong>${yLabel}:</strong> ${yValue}</p>
+        <p style="font-size: 9px; margin: 1px 0; line-height: 1;"><strong>時間:</strong> ${p.assistTime}s</p>
+        <div class="ingredient-images" style="gap: 1px; margin-top: 3px; display: flex; justify-content: center; flex-wrap: wrap;">${ingredientImagesHtml || 'なし'}</div>
     `;
 }
 
@@ -340,8 +340,6 @@ function handlePlotlyHover(data) {
         
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
-        
-        // カード内の文字色設定を削除 (CSSで統一するため)
         
         detailCard.style.top = `${yPos + 15}px`; 
         detailCard.style.left = `${xPos + 15}px`; 
@@ -376,11 +374,11 @@ function handlePlotlyClick(data) {
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
 
-        // ★重要修正 4★: カードの位置を画面の上から25%に再調整（グラフの上部中央付近）
+        // カードの位置を画面の上から25%に再調整（グラフの上部中央付近）
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         
         detailCard.style.top = `25vh`; 
-        // カードの最大幅が100pxになったので、その半分(50px)を引いて中央寄せ
+        // カードの最大幅が100pxなので、その半分(50px)を引いて中央寄せ
         detailCard.style.left = `${(viewportWidth / 2) - 50}px`; 
         detailCard.style.display = 'block';
 
