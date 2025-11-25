@@ -17,9 +17,9 @@
         .scatter-plot {
             width: 100%;
             height: 100%;
-            /* ★最重要修正 5★: グラフ内での全てのブラウザ操作（ズーム、パン）を無効化し、Plotlyの動作に完全に依存させる */
-            /* これにより、Plotlyのdragmode: 'pan'設定が優先され、意図しないズームを防ぐ */
-            touch-action: none; 
+            /* ★最重要修正 4★: touch-action: none を削除。ブラウザのデフォルトピンチズームをブロックしないようにする。
+               これにより、Plotlyのズーム設定が無効であれば、2本指操作はブラウザのズームとして機能するはずです。 */
+            /* touch-action: none; を削除 */
         }
 
         /* --- タブスタイリング (変更なし) --- */
@@ -60,42 +60,43 @@
             background-color: #ffffff;
             border: 2px solid #333;
             border-radius: 8px;
-            padding: 8px; /* パディングを縮小 */
+            padding: 5px; /* ★重要修正 5★: パディングをさらに縮小 */
             box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
             z-index: 100;
             display: none;
-            /* ★重要修正 6★: カードの最大幅を大幅に縮小 (100px = 約30%のサイズ) */
             max-width: 100px; 
             font-family: sans-serif;
-            text-align: center; /* コンテンツを中央寄せ */
-            line-height: 1.2; /* 行間を詰める */
+            text-align: center;
+            line-height: 1.1; /* 行間をさらに詰める */
+            font-size: 10px; /* 全体的な文字サイズを小さくする */
         }
         #detail-card h3 {
             margin-top: 0;
             color: #2a6496;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 3px;
-            margin-bottom: 5px;
+            /* 境界線を細く */
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+            margin-bottom: 3px;
         }
         #pokemon-image {
             display: block;
-            width: 40px; /* 画像サイズを縮小 */
-            height: 40px;
-            margin: 0 auto 5px auto;
+            width: 35px;
+            height: 35px;
+            margin: 0 auto 3px auto;
             border: 1px solid #eee;
             border-radius: 50%;
             object-fit: contain;
         }
         .ingredient-images {
             display: flex;
-            gap: 2px; /* ギャップを縮小 */
+            gap: 1px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         .ingredient-images img {
-            width: 20px; /* 食材アイコンを縮小 */
-            height: 20px;
+            width: 18px; /* 食材アイコンをさらに縮小 */
+            height: 18px;
             border-radius: 4px;
             object-fit: contain;
             background-color: #f7f7f7;
