@@ -3,17 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ポケモン散布図</title>
+    <title>ポケモン散布図切り替え</title>
     
     <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script> 
     
     <style>
         /* グラフのレスポンシブ対応とスタイリング */
-        #scatter-plot {
+        /* グラフコンテナの親要素 */
+        #plot-container {
             width: 95vw;
             height: 90vh;
             margin: 20px auto;
         }
+
+        /* 個別グラフのサイズ調整 */
+        .scatter-plot {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- タブスタイリング --- */
+        .tab-button-container {
+            width: 95vw;
+            margin: 10px auto 0 auto;
+            display: flex;
+            justify-content: center;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            transition: background-color 0.3s;
+        }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+        /* アクティブなタブ */
+        .tab-button.active {
+            background-color: #fff;
+            border-color: #333;
+            color: #333;
+            border-bottom: 2px solid #fff; /* 下の線を隠す */
+        }
+        /* --- /タブスタイリング --- */
+
 
         /* 詳細情報カード（カスタムツールチップ）のスタイル */
         #detail-card {
@@ -24,7 +66,7 @@
             padding: 15px;
             box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
             z-index: 100;
-            pointer-events: none; /* マウスイベントを透過させる */
+            pointer-events: none;
             display: none;
             max-width: 200px;
             font-family: sans-serif;
@@ -63,7 +105,16 @@
 </head>
 <body>
 
-    <div id="scatter-plot"></div>
+    <div class="tab-button-container">
+        <button class="tab-button active" onclick="openTab('ingredient')">食材タイプグラフ</button>
+        <button class="tab-button" onclick="openTab('skill')">スキルタイプグラフ</button>
+    </div>
+
+    <div id="plot-container">
+        <div id="scatter-plot-ingredient" class="scatter-plot tab-content"></div>
+        
+        <div id="scatter-plot-skill" class="scatter-plot tab-content" style="display: none;"></div>
+    </div>
 
     <div id="detail-card"></div>
     
