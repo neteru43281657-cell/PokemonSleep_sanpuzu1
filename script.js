@@ -40,7 +40,6 @@ const pokemonData = [
 // データをPlotlyの形式に変換
 const x_data = pokemonData.map(p => p.assistTime);
 const y_data = pokemonData.map(p => p.ingredientRate);
-// プロット上に表示するポケモン名
 const pokemon_names_for_label = pokemonData.map(p => p.name);
 
 
@@ -48,17 +47,14 @@ const pokemon_names_for_label = pokemonData.map(p => p.name);
 const trace = {
   x: x_data,
   y: y_data,
-  // ★変更点1★: modeを 'markers+text' に変更して、マーカーとテキスト両方を表示
   mode: 'markers+text', 
   type: 'scatter',
   name: 'ポケモン散布図',
-  // ★変更点2★: プロットの横に表示するテキストとしてポケモン名を設定
   text: pokemon_names_for_label,
-  // ★変更点3★: テキストの表示位置とフォントサイズを設定
-  textposition: 'top center', // プロットの上に中央寄せで表示
+  textposition: 'top center',
   textfont: {
     family: 'Arial, sans-serif',
-    size: 10, // 小さめのフォントサイズ
+    size: 10,
     color: '#333'
   },
   marker: {
@@ -66,19 +62,44 @@ const trace = {
     opacity: 0.8,
     color: 'rgb(50, 100, 200)'
   },
-  hoverinfo: 'none', // デフォルトのツールチップを無効化
+  hoverinfo: 'none',
 };
 
 const layout = {
-  title: '✨ ポケモンの おてつだい時間 vs 食材確率 🍳',
+  // ★修正点1★: タイトルの変更
+  title: '散布図_食材ポケモン',
   xaxis: {
-    title: 'おてつだい時間 (秒)',
-    rangemode: 'tozero',
+    title: {
+        text: 'おてつだい時間 (秒)',
+        // ★修正点2★: x軸タイトルのフォントサイズを大きく
+        font: {
+            size: 18 
+        }
+    },
+    // ★修正点3★: 第一象限表示のため、範囲開始を0に明示
+    range: [0, Math.max(...x_data) * 1.1], // Xデータの最大値の1.1倍まで表示
+    // ★修正点4★: x軸目盛りのフォントサイズを大きく
+    tickfont: {
+        size: 14 
+    },
+    // rangemode は削除
   },
   yaxis: {
-    title: '食材確率 (%)',
-    rangemode: 'tozero',
-    tickformat: '.1f'
+    title: {
+        text: '食材確率 (%)',
+        // ★修正点5★: y軸タイトルのフォントサイズを大きく
+        font: {
+            size: 18
+        }
+    },
+    // ★修正点6★: 第一象限表示のため、範囲開始を0に明示
+    range: [0, Math.max(...y_data) * 1.1], // Yデータの最大値の1.1倍まで表示
+    // ★修正点7★: y軸目盛りのフォントサイズを大きく
+    tickfont: {
+        size: 14
+    },
+    tickformat: '.1f',
+    // rangemode は削除
   },
   hovermode: false, 
   responsive: true
@@ -145,4 +166,3 @@ function hideDetailCard() {
 
 plotDiv.on('plotly_unhover', hideDetailCard);
 plotDiv.on('plotly_click', hideDetailCard);
-```http://googleusercontent.com/image_generation_content/0
