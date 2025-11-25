@@ -1,5 +1,4 @@
-// --- 1. ポケモンデータの定義 ---
-// 食材名については、ファイル名に合わせて「ねぎ」「りんご」「たまご」に統一しています。
+// --- 1. ポケモンデータの定義 (35匹) ---
 const pokemonData = [
     { name: "フシギバナ", file: "3.webp", assistTime: 2800, ingredientRate: 26.60, ingredientsText: "ミツ トマト ポテト" },
     { name: "リザードン", file: "6.webp", assistTime: 2400, ingredientRate: 22.40, ingredientsText: "ミート ジンジャー ハーブ" },
@@ -26,9 +25,9 @@ const pokemonData = [
     { name: "レントラー", file: "405.webp", assistTime: 2400, ingredientRate: 20.00, ingredientsText: "トマト オイル コーヒー" },
     { name: "ドクロッグ", file: "454.webp", assistTime: 3400, ingredientRate: 22.90, ingredientsText: "オイル ミート" },
     { name: "ユキノオー", file: "460.webp", assistTime: 3000, ingredientRate: 25.00, ingredientsText: "トマト たまご きのこ" },
-    { name: "ダークライ", file: "491.webp", assistTime: 2900, ingredientRate: 19.20, ingredientsText: "" }, // 食材なし
+    { name: "ダークライ", file: "491.webp", assistTime: 2900, ingredientRate: 19.20, ingredientsText: "" }, 
     { name: "パンプジン（中玉）", file: "711.webp", assistTime: 3200, ingredientRate: 13.00, ingredientsText: "カボチャ マメ ポテト" },
-    { name: "クワガノン", file: "738.webp", assistTime: 2800, ingredientRate: 19.40, ingredientsText: "コーヒー きのこ ミツ" },
+    { name: "クワガノン", file: "738.webp", assistTime: 2800, ingredientTime: 19.40, ingredientsText: "コーヒー きのこ ミツ" },
     { name: "キテルグマ", file: "760.webp", assistTime: 2800, ingredientRate: 22.90, ingredientsText: "コーン ミート たまご" },
     { name: "キュワワー", file: "764.webp", assistTime: 2500, ingredientRate: 16.70, ingredientsText: "コーン ジンジャー カカオ" },
     { name: "ウッウ", file: "845.webp", assistTime: 2700, ingredientRate: 16.50, ingredientsText: "オイル ポテト たまご" },
@@ -41,7 +40,6 @@ const pokemonData = [
 // データをPlotlyの形式に変換
 const x_data = pokemonData.map(p => p.assistTime);
 const y_data = pokemonData.map(p => p.ingredientRate);
-// デフォルトのホバーテキストとしてポケモン名と基本情報を設定
 const text_data = pokemonData.map(p => `${p.name}<br>おてつだい時間: ${p.assistTime}秒<br>食材確率: ${p.ingredientRate}%`);
 
 
@@ -58,11 +56,9 @@ const trace = {
     opacity: 0.8,
     color: 'rgb(50, 100, 200)'
   },
-  // デフォルトのツールチップを無効化し、カスタムツールチップを使用
-  hoverinfo: 'none', 
+  hoverinfo: 'none', // デフォルトのツールチップを無効化
 };
 
-// グラフのレイアウト設定
 const layout = {
   title: '✨ ポケモンの おてつだい時間 vs 食材確率 🍳',
   xaxis: {
@@ -74,17 +70,16 @@ const layout = {
     rangemode: 'tozero',
     tickformat: '.1f'
   },
-  // PCとスマホに対応（レスポンシブ）
+  // ★重要★: ホバーモードを「最も近い点」に設定。
+  // これにより、空白領域での誤認識を防ぎます。
+  hovermode: 'closest', 
   responsive: true
 };
 
-// グラフの描画
 const plotDiv = document.getElementById('scatter-plot');
 Plotly.newPlot(plotDiv, [trace], layout, {
-    // 拡大縮小（ズーム）、パン（移動）のツールバーを有効化
     displayModeBar: true, 
     scrollZoom: true,
-    // Plotlyのデフォルトツールチップを非表示
     displaylogo: false
 });
 
@@ -95,16 +90,11 @@ const detailCard = document.getElementById('detail-card');
 
 /**
  * 詳細情報カードのHTMLを生成する関数
- * @param {object} p - ポケモンデータオブジェクト
  */
 function createDetailCardHtml(p) {
-    // ポケモン画像パス: images/ファイル名
     const pokemonImagePath = `./images/${p.file}`; 
-    
-    // 食材リストを分割
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
-    // 食材画像のパスを images/食材名.webp に設定
     const ingredientImagesHtml = ingredients.map(ing => {
         // 画像ファイル名が「食材名.webp」であると想定
         const ingImagePath = `./images/${ing}.webp`; 
@@ -123,24 +113,23 @@ function createDetailCardHtml(p) {
 
 // グラフ上の点にカーソルが合わさった時、またはクリックされた時のイベント
 plotDiv.on('plotly_hover', function(data) {
-    // ホバーされた点のインデックスを取得
-    const pointIndex = data.points[0].pointIndex;
-    const hoveredPokemon = pokemonData[pointIndex];
-    
-    // カーソル位置を取得
-    const xPos = data.event.clientX;
-    const yPos = data.event.clientY;
+    // data.pointsが存在し、インデックスが有効な場合にのみ処理を実行
+    if (data.points && data.points.length > 0) {
+        const pointIndex = data.points[0].pointIndex;
+        const hoveredPokemon = pokemonData[pointIndex];
+        
+        const xPos = data.event.clientX;
+        const yPos = data.event.clientY;
 
-    // カードの内容を更新
-    detailCard.innerHTML = createDetailCardHtml(hoveredPokemon);
-    
-    // カードの位置を設定し表示（カーソルの少し右下に表示）
-    detailCard.style.top = `${yPos + 15}px`; 
-    detailCard.style.left = `${xPos + 15}px`; 
-    detailCard.style.display = 'block';
+        detailCard.innerHTML = createDetailCardHtml(hoveredPokemon);
+        
+        // カードの位置を設定し表示（カーソルの少し右下に表示）
+        detailCard.style.top = `${yPos + 15}px`; 
+        detailCard.style.left = `${xPos + 15}px`; 
+        detailCard.style.display = 'block';
+    }
 });
 
-// グラフからカーソルが離れた時、またはクリック時
 function hideDetailCard() {
     detailCard.style.display = 'none';
 }
@@ -148,5 +137,5 @@ function hideDetailCard() {
 // カーソルが離れたらカードを非表示にする
 plotDiv.on('plotly_unhover', hideDetailCard);
 
-// クリック時もカーソルが離れたとみなして非表示にする（ホバーでの表示を優先）
+// クリック時も非表示にする（ホバーイベントで表示を制御するため）
 plotDiv.on('plotly_click', hideDetailCard);
