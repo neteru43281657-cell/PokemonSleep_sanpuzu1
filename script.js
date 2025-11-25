@@ -66,40 +66,33 @@ const trace = {
 };
 
 const layout = {
-  // ★修正点1★: タイトルの変更
   title: '散布図_食材ポケモン',
   xaxis: {
     title: {
         text: 'おてつだい時間 (秒)',
-        // ★修正点2★: x軸タイトルのフォントサイズを大きく
         font: {
             size: 18 
         }
     },
-    // ★修正点3★: 第一象限表示のため、範囲開始を0に明示
-    range: [0, Math.max(...x_data) * 1.1], // Xデータの最大値の1.1倍まで表示
-    // ★修正点4★: x軸目盛りのフォントサイズを大きく
+    // ★修正点★: rangeを削除し、rangemode: 'tozero' を復活させる
+    rangemode: 'tozero', 
     tickfont: {
         size: 14 
     },
-    // rangemode は削除
   },
   yaxis: {
     title: {
         text: '食材確率 (%)',
-        // ★修正点5★: y軸タイトルのフォントサイズを大きく
         font: {
             size: 18
         }
     },
-    // ★修正点6★: 第一象限表示のため、範囲開始を0に明示
-    range: [0, Math.max(...y_data) * 1.1], // Yデータの最大値の1.1倍まで表示
-    // ★修正点7★: y軸目盛りのフォントサイズを大きく
+    // ★修正点★: rangeを削除し、rangemode: 'tozero' を復活させる
+    rangemode: 'tozero',
     tickfont: {
         size: 14
     },
     tickformat: '.1f',
-    // rangemode は削除
   },
   hovermode: false, 
   responsive: true
