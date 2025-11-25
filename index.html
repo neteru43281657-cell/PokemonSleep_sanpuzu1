@@ -12,17 +12,18 @@
         /* グラフコンテナの親要素 */
         #plot-container {
             width: 95vw;
-            height: 85vh; /* 出典のスペースを確保するため高さを少し減らす */
+            height: 85vh; 
             margin: 20px auto 0 auto;
         }
-
-        /* 個別グラフのサイズ調整 */
+        /* ★修正ポイント★: グラフの縦横比をスマホで見やすく調整（CSSで強制的な縦長を防ぐ） */
         .scatter-plot {
             width: 100%;
             height: 100%;
+            /* スマホで横幅に収まりやすくするための設定 */
+            touch-action: manipulation;
         }
 
-        /* --- タブスタイリング --- */
+        /* --- タブスタイリング (変更なし) --- */
         .tab-button-container {
             width: 95vw;
             margin: 10px auto 0 auto;
@@ -52,25 +53,25 @@
             background-color: #fff;
             border-color: #333;
             color: #333;
-            border-bottom: 2px solid #fff; /* 下の線を隠す */
+            border-bottom: 2px solid #fff; 
         }
-        /* --- /タブスタイリング --- */
 
-
-        /* 詳細情報カード（カスタムツールチップ）のスタイル */
+        /* --- 詳細情報カード（カスタムツールチップ）のスタイル --- */
         #detail-card {
-            position: absolute;
+            /* position: absolute; は維持 */
+            position: absolute; 
             background-color: #ffffff;
             border: 2px solid #333;
             border-radius: 8px;
             padding: 15px;
             box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
             z-index: 100;
-            pointer-events: none;
+            /* ★修正ポイント★: タップ操作に対応するため pointer-events: none; を削除 (JSで非表示時に制御) */
             display: none;
             max-width: 200px;
             font-family: sans-serif;
         }
+        /* (その他カード内のスタイルは変更なし) */
         #detail-card h3 {
             margin-top: 0;
             color: #2a6496;
@@ -102,7 +103,7 @@
             background-color: #f7f7f7;
         }
         
-        /* --- 出典スタイリング --- */
+        /* --- 出典スタイリング (変更なし) --- */
         #source-info {
             width: 95vw;
             margin: 10px auto 20px auto;
