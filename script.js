@@ -162,10 +162,9 @@ const commonLayout = {
 // 食材タイプグラフのレイアウト
 const layoutIngredient = {
     ...commonLayout,
-    // タイトルを修正
     title: {
         text: '散布図_食材タイプ',
-        font: { size: 26, color: COLOR_INGREDIENT } // 色をオレンジに変更
+        font: { size: 26, color: COLOR_INGREDIENT } 
     },
     xaxis: {
         title: { text: 'おてつだい時間 (秒)', font: { size: 18 } },
@@ -189,10 +188,9 @@ const layoutIngredient = {
 // スキルタイプグラフのレイアウト
 const layoutSkill = {
     ...commonLayout,
-    // タイトルを修正
     title: {
         text: '散布図_スキルタイプ',
-        font: { size: 26, color: COLOR_SKILL } // 色を青に変更
+        font: { size: 26, color: COLOR_SKILL }
     },
     xaxis: {
         title: { text: 'おてつだい時間 (秒)', font: { size: 18 } },
@@ -279,7 +277,6 @@ function createDetailCardHtml(p, type) {
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
 
     const ingredientImagesHtml = ingredients.map(ing => {
-        // ウッウの'たまご'は、食材画像ファイル名に合わせて調整（前回修正済み）
         const ingImagePath = `./images/${ing}.webp`; 
         return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
     }).join('');
@@ -287,13 +284,6 @@ function createDetailCardHtml(p, type) {
     // 表示するY軸のデータとラベルを決定
     const yValue = type === 'ingredient' ? `${p.ingredientRate}%` : `${p.skillRate}%`;
     const yLabel = type === 'ingredient' ? '食材確率' : 'スキル確率';
-
-    // カスタムカード内の色をグラフの色と合わせる
-    const cardColor = type === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
-
-    // detail-card h3のスタイルを一時的に変更
-    detailCard.querySelector('h3').style.color = cardColor;
-
 
     return `
         <h3>${p.name}</h3>
@@ -310,7 +300,6 @@ function createDetailCardHtml(p, type) {
 function handlePlotlyHover(data) {
     if (data.points && data.points.length > 0) {
         
-        // どのデータセットを参照すべきか、アクティブなタブから判断
         const activeTab = document.querySelector('.tab-button.active').textContent.includes('食材') ? 'ingredient' : 'skill';
         
         const pointIndex = data.points[0].pointIndex;
@@ -319,15 +308,20 @@ function handlePlotlyHover(data) {
         const xPos = data.event.clientX;
         const yPos = data.event.clientY;
         
-        // カードのHTMLを生成・設定
+        // 1. カードのHTMLを生成・設定
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         
-        // カスタムカード内の色をグラフの色と合わせる
+        // 2. カード内の要素の色を再設定 (★修正ポイント★: innerHTML設定後に行う)
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
-        detailCard.querySelector('h3').style.color = cardColor;
+        
+        // detailCard.querySelector('h3') が有効な要素を参照できるように、innerHTML設定後に呼び出す
+        const cardTitle = detailCard.querySelector('h3');
+        if(cardTitle) {
+             cardTitle.style.color = cardColor;
+        }
 
-
+        // 3. カードの位置を設定し、表示
         detailCard.style.top = `${yPos + 15}px`; 
         detailCard.style.left = `${xPos + 15}px`; 
         detailCard.style.display = 'block';
@@ -339,6 +333,6 @@ function handlePlotlyHover(data) {
 
 function hideDetailCard() {
     detailCard.style.display = 'none';
-    // カードが非表示になったら、色をリセット（次のホバー時に再設定されるため必須ではないが、クリーンな状態を保つ）
+    // カードが非表示になったら、色をリセット（次のホバー時のために念のため実行）
     detailCard.style.borderColor = '#333';
 }
