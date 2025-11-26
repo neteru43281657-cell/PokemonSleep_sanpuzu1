@@ -165,7 +165,7 @@ const commonLayout = {
 // 食材タイプレイアウト
 const layoutIngredient = {
     ...commonLayout,
-    dragmode: 'pan',          // ← 1本指ドラッグはパン固定
+    dragmode: 'pan',
     title: {
         text: '散布図_食材タイプ',
         font: { size: 26, color: COLOR_INGREDIENT } 
@@ -192,7 +192,7 @@ const layoutIngredient = {
 // スキルタイプレイアウト
 const layoutSkill = {
     ...commonLayout,
-    dragmode: 'pan',          // ← 1本指ドラッグはパン固定
+    dragmode: 'pan',
     title: {
         text: '散布図_スキルタイプ',
         font: { size: 26, color: COLOR_SKILL }
@@ -219,14 +219,12 @@ const layoutSkill = {
 // Plotly コンフィグ
 const config = {
     displayModeBar: true,
-    scrollZoom: false,       // ホイールズーム無効（PC）
+    scrollZoom: false,
     displaylogo: false,
     modeBarButtonsToRemove: [
         'zoom2d', 'pan2d', 'select2d', 'lasso2d',
         'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'
     ],
-    // dragmode / touchmode は layout で設定
-    // doubleClick はデフォルトのまま（自前のダブルタップ判定を使う）
 };
 
 // ==============================
@@ -247,15 +245,12 @@ function plotGraph(type) {
 
     if (!plotDiv._plotly_data) {
         Plotly.newPlot(plotDiv, [trace], layout, config).then(() => {
-            // 初期レイアウト保存
             initialLayout[type] = JSON.parse(JSON.stringify(layout));
         });
 
-        // イベント登録
         plotDiv.on('plotly_hover', handlePlotlyHover);
         plotDiv.on('plotly_unhover', hideDetailCard);
         plotDiv.on('plotly_click', handlePlotlyClick);
-        // ダブルクリックイベントは使わず、自前のダブルタップ判定で handlePlotlyDoubleClick を呼ぶ
     } else {
         Plotly.relayout(plotDiv, layout);
     }
@@ -293,27 +288,34 @@ let lastTapTime = 0;   // ダブルタップ判定用
 function createDetailCardHtml(p, type) {
     const pokemonImagePath = `./images/${p.file}`;
     const ingredients = p.ingredientsText ? p.ingredientsText.split(' ') : [];
-
     const ingredientImagesHtml = ingredients.map(ing => {
         const ingImagePath = `./images/${ing}.webp`;
         return `<img src="${ingImagePath}" alt="${ing}" title="${ing}">`;
     }).join('');
 
-    const yValue = type === 'ingredient' ? `${p.ingredientRate}%` : `${p.skillRate}%`;
-    const yLabel = type === 'ingredient' ? '食材確率' : 'スキル確率';
+    const rate =
+        type === 'ingredient'
+            ? (p.ingredientRate != null ? p.ingredientRate.toFixed(2) : null)
+            : (p.skillRate != null ? p.skillRate.toFixed(2) : null);
+
+    const rateLabel = type === 'ingredient' ? '食材確率' : 'スキル発動確率';
+    const rateText = rate !== null ? `${rate}％` : '―';
+    const skillText = p.skill || '―';
+    const ingredientsLine = ingredients.length ? ingredients.join('　') : '―';
 
     return `
-        <h3 style="font-size: 11px; margin-bottom: 3px; padding-bottom: 2px; border-bottom: 1px solid #ccc;">${p.name}</h3>
-        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}" style="width: 35px; height: 35px; margin-bottom: 3px; border-radius: 50%;">
-        <p style="font-size: 9px; margin: 1px 0; line-height: 1;"><strong>${yLabel}:</strong> ${yValue}</p>
-        <p style="font-size: 9px; margin: 1px 0; line-height: 1;"><strong>時間:</strong> ${p.assistTime}s</p>
-        <div class="ingredient-images" style="gap: 1px; margin-top: 3px; display: flex; justify-content: center; flex-wrap: wrap;">${ingredientImagesHtml || 'なし'}</div>
+        <h3 style="font-size: 13px; margin: 0 0 6px 0; padding-bottom: 4px; border-bottom: 1px solid #ccc;">${p.name}</h3>
+        <img id="pokemon-image" src="${pokemonImagePath}" alt="${p.name}" style="width: 50px; height: 50px; margin-bottom: 6px; border-radius: 50%;">
+        <p style="font-size: 11px; margin: 2px 0;"><strong>メインスキル：</strong>${skillText}</p>
+        <p style="font-size: 11px; margin: 2px 0;"><strong>${rateLabel}：</strong>${rateText}</p>
+        <p style="font-size: 11px; margin: 2px 0;"><strong>おてつだい時間：</strong>${p.assistTime}秒</p>
+        <p style="font-size: 11px; margin: 4px 0 2px 0;">${ingredientsLine}</p>
+        <div class="ingredient-images" style="gap: 2px; margin-top: 2px; display: flex; justify-content: center; flex-wrap: wrap;">${ingredientImagesHtml}</div>
     `;
 }
 
 // PC 用ホバー
 function handlePlotlyHover(data) {
-    // すでにタップ表示中なら無視（スマホとの競合防止）
     if (detailCard.style.display === 'block') return;
 
     if (data.points && data.points.length > 0) {
@@ -348,7 +350,7 @@ function handlePlotlyClick(data) {
     const plotDiv = document.getElementById(`scatter-plot-${activeTab}`);
 
     // --- ダブルタップ判定 ---
-    if (now - lastTapTime < 350) {   // 350ms 以内に2回タップ
+    if (now - lastTapTime < 350) {
         lastTapTime = 0;
         handlePlotlyDoubleClick();
         return;
@@ -360,24 +362,21 @@ function handlePlotlyClick(data) {
         const pointIndex = data.points[0].pointIndex;
         const hoveredPokemon = allPokemonData[activeTab][pointIndex];
 
-        // カード表示（画面上部中央）
         detailCard.innerHTML = createDetailCardHtml(hoveredPokemon, activeTab);
         const cardColor = activeTab === 'ingredient' ? COLOR_INGREDIENT : COLOR_SKILL;
         detailCard.style.borderColor = cardColor;
 
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         detailCard.style.top = `25vh`;
-        detailCard.style.left = `${(viewportWidth / 2) - 50}px`; // max-width 100px を想定
+        detailCard.style.left = `${(viewportWidth / 2) - 90}px`; // max-width 180px を想定
         detailCard.style.display = 'block';
 
-        // 該当ポケモン付近へ軽くズームイン
         const newLayout = {
             'xaxis.range': [data.points[0].x - 500, data.points[0].x + 500],
             'yaxis.range': [data.points[0].y * 0.9, data.points[0].y * 1.1]
         };
         Plotly.relayout(plotDiv, newLayout);
     } else {
-        // 点以外をタップしたらカードを消す
         hideDetailCard();
     }
 }
