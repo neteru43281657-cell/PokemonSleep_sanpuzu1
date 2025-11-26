@@ -53,21 +53,21 @@
         }
 
         /* --- 詳細情報カード（カスタムツールチップ）のスタイル --- */
-        #detail-card {
-            position: absolute; 
-            background-color: #ffffff;
-            border: 2px solid #333;
-            border-radius: 8px;
-            padding: 5px;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
-            z-index: 100;
-            display: none;
-            max-width: 100px; 
-            font-family: sans-serif;
-            text-align: center;
-            line-height: 1.1;
-            font-size: 10px;
-        }
+#detail-card {
+    position: absolute;
+    background-color: #ffffff;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px 10px;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+    z-index: 100;
+    display: none;
+    max-width: 180px;         /* ★広めにとる */
+    font-family: sans-serif;
+    text-align: center;
+    line-height: 1.3;         /* 行間ゆったりめ */
+    font-size: 11px;
+}
         #detail-card h3 {
             margin-top: 0;
             color: #2a6496;
@@ -91,13 +91,13 @@
             justify-content: center;
             margin-top: 3px;
         }
-        .ingredient-images img {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-            object-fit: contain;
-            background-color: #f7f7f7;
-        }
+.ingredient-images img {
+    width: 22px;              /* 少し大きめに */
+    height: 22px;
+    border-radius: 4px;
+    object-fit: contain;
+    background-color: #f7f7f7;
+}
         
         /* --- 出典スタイリング --- */
         #source-info {
